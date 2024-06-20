@@ -18,7 +18,12 @@ const app = createApp(App);
 
 app.use(PrimeVue,
   {
-    theme: { preset: Lara },
+    theme: {
+      preset: Lara,
+      options: {
+        darkModeSelector: 'light',
+      }
+    },
     ripple: true
   }
 );

@@ -8,7 +8,7 @@ const knobValue = ref(0);
 
 setInterval(() => {
   knobValue.value = parseInt(Math.random() * 100);
-}, 1000);
+}, 500);
 
 
 </script>
@@ -22,13 +22,12 @@ setInterval(() => {
       </FloatLabel>
       <Button size="small">搜索</Button>
       <div>
-        <span>{{ inputValue }}</span>
+        <span>{{ inputValue + knobValue }}</span>
       </div>
     </div>
 
     <div>
-      <Knob v-model="knobValue" readonly="" />
+      <Knob v-model="knobValue" readonly />
     </div>
-
   </div>
 </template>
