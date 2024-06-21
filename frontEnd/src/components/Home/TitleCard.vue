@@ -1,22 +1,18 @@
 <template>
   <Card class="mainCard">
-    <template #title>
-      {{ pageTitle }}
-    </template>
-    <template #content>
-      {{ pageDescribe }}
-    </template>
+    <template #title>{{ pageTitle }}</template>
+    <template #content>{{ pageDescribe }}</template>
   </Card>
 </template>
 
 
 <script setup>
 import Card from "primevue/card";
+import { watch } from "vue";
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();
-
 
 const pageTitle = computed(() => {
   return route.name

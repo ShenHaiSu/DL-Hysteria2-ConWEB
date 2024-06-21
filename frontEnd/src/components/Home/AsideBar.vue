@@ -4,8 +4,11 @@
     <template #start>
       <div AsideBarMenuStart>
         <span>
-          <iconUser />Hysteria2ConfWeb
+          <IconWeb style="font-size: 35px;" />Hysteria2ConfWeb
         </span>
+      </div>
+      <div AsideBarMenuStartAuth>
+        <AuthShow />
       </div>
     </template>
 
@@ -15,13 +18,6 @@
         <span>{{ item.label }}</span>
       </div>
     </template>
-
-    <!-- 侧边栏底栏 -->
-    <!-- <template #end>
-      <div AsideBarMenuEnd>
-        <span>底栏</span>
-      </div>
-    </template> -->
   </Menu>
 </template>
 
@@ -30,8 +26,10 @@
 import Menu from 'primevue/menu';
 import { onMounted } from 'vue';
 import { ref, reactive } from "vue";
-import iconUser from "@/components/icons/IconUser.vue";
+import IconUser from "@/components/icons/IconUser.vue";
+import IconWeb from "@/components/icons/IconWeb.vue"
 import { useRouter } from 'vue-router';
+import AuthShow from "@/components/Home/AuthShow.vue"
 
 // 初始化
 const router = useRouter();
@@ -76,39 +74,37 @@ onMounted(() => {
 <style>
 div[AsideBarMenuMain] {
   min-height: 98.5vh;
+  max-width: 10vw;
   margin-right: 10px;
   box-shadow: 0 0 3px 0.5px rgb(187, 187, 187);
 }
 
 div[AsideBarMenuStart],
-div[AsideBarMenuEnd] {
+div[AsideBarMenuStartAuth] {
   font-size: larger;
+  padding: 0 5px;
 }
 
 div[AsideBarMenuStart] {
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   font-size: 20px;
   line-height: 20px;
   height: 40px;
   justify-content: center;
   text-align: center;
   display: block;
-
 }
-
-div[AsideBarMenuEnd] {}
 
 div[AsideBarMenuItem]>span {
   display: block;
   margin: 0 3px;
-  padding: 5px 5px;
+  padding: 8px 0px 8px 20px;
 }
 
 div[AsideBarMenuItem]:hover {
   cursor: pointer;
 }
-
 
 .p-menu-end {
   display: block;
