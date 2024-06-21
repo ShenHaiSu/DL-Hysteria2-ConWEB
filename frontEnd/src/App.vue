@@ -2,7 +2,6 @@
 import { RouterLink, RouterView } from 'vue-router'
 
 import { ref, reactive } from 'vue';
-import Panel from 'primevue/panel';
 import AsideBar from "@/components/Home/AsideBar.vue"
 import TitleCard from "@/components/Home/TitleCard.vue";
 
@@ -24,34 +23,10 @@ import TitleCard from "@/components/Home/TitleCard.vue";
 
 <style scoped>
 div.mainContainer {
-  padding-top: 30px;
-}
-
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+  padding: 30px 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+  box-shadow: 0 0 3px 1px rgb(187, 187, 187);
+  min-height: 88vh;
 }
 </style>

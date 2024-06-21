@@ -2,13 +2,14 @@
 import { ref } from 'vue';
 import FloatLabel from "primevue/floatlabel";
 import Knob from 'primevue/knob';
+import Slider from 'primevue/slider';
 
 const inputValue = ref("");
 const knobValue = ref(0);
 
 setInterval(() => {
   knobValue.value = parseInt(Math.random() * 100);
-}, 500);
+}, 1000);
 
 
 </script>
@@ -28,6 +29,7 @@ setInterval(() => {
 
     <div>
       <Knob v-model="knobValue" readonly />
+      <Slider v-model="knobValue" /> 
     </div>
   </div>
 </template>
