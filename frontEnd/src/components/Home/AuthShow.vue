@@ -1,5 +1,5 @@
 <template>
-  <div AuthCardContainer>
+  <div AuthCardContainer @click="mainClick">
     <IconUser />
     <span>未登录</span>
   </div>
@@ -8,6 +8,10 @@
 <script setup>
 import IconUser from '@/components/icons/IconUser.vue';
 
+
+const mainClick = () => {
+  alert("登录信息被点击")
+}
 </script>
 
 <style scoped>

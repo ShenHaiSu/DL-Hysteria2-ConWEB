@@ -19,6 +19,9 @@
       </div>
     </template>
   </Menu>
+  <!-- 伸缩侧边栏控制器 -->
+  <!-- <div style="display: block; position: fixed; width: 50px; height: 50px; left: 1vh; bottom: 1vh; background-color: antiquewhite;">
+  </div> -->
 </template>
 
 
@@ -26,7 +29,6 @@
 import Menu from 'primevue/menu';
 import { onMounted } from 'vue';
 import { ref, reactive } from "vue";
-import IconUser from "@/components/icons/IconUser.vue";
 import IconWeb from "@/components/icons/IconWeb.vue"
 import { useRouter } from 'vue-router';
 import AuthShow from "@/components/Home/AuthShow.vue"

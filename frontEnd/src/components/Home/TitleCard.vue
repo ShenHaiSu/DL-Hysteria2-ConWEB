@@ -1,7 +1,7 @@
 <template>
   <Card class="mainCard">
     <template #title>{{ pageTitle }}</template>
-    <template #content>{{ pageDescribe }}</template>
+    <template #content>{{ pageDescribe ? pageDescribe : "无页面描述" }}</template>
   </Card>
 </template>
 
@@ -26,8 +26,8 @@ const pageDescribe = computed(() => {
 
 <style scoped>
 div.mainCard {
+  min-height: 105px;
   width: 100%;
-  height: 10vh;
   box-shadow: 0 0 3px 1px rgb(187, 187, 187);
 }
 </style>
