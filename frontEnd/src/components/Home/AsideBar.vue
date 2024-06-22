@@ -66,10 +66,7 @@ onMounted(() => {
   // menuContent.push({ separator: true });
 
   // 将侧边栏内容与分割线合并推进
-  for (let i = 0; i < menuContent.length; i++) {
-    const element = menuContent[i];
-    menuShowContent.push(element, { separator: true });
-  }
+  for (let i = 0; i < menuContent.length; i++) menuShowContent.push(menuContent[i], { separator: true });
 })
 </script>
 

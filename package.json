@@ -1,0 +1,14 @@
+{
+  "name": "DL-Hysteria2-ConWEB",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ShenHaiSu/DL-Hysteria2-ConWEB.git",
+  "author": "DaoLuoLTS <61882306+ShenHaiSu@users.noreply.github.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "cd frontEnd && yarn && yarn run build",
+    "dev": "cd frontEnd && yarn && yarn run dev",
+    "run": "cd backEnd && node index.js"
+  },
+  "dependencies": {}
+}

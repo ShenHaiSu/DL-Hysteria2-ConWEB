@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@primevue/themes": "4.0.0-rc.2",
+    "@types/md5": "^2.3.5",
+    "axios": "^1.7.2",
+    "md5": "^2.3.0",
     "pinia": "^2.1.7",
     "primevue": "4.0.0-rc.2",
     "vue": "^3.4.21",

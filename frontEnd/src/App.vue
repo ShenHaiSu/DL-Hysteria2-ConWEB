@@ -1,16 +1,20 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
 
-import { ref, reactive } from 'vue';
-import AsideBar from "@/components/Home/AsideBar.vue"
-import TitleCard from "@/components/Home/TitleCard.vue";
+import { ref, reactive, defineAsyncComponent } from 'vue';
+// import AsideBar from "@/components/Home/AsideBar.vue"
+// import TitleCard from "@/components/Home/TitleCard.vue";
+
+// 动态引入
+const AsideBar = defineAsyncComponent(() => import("@/components/Home/AsideBar.vue"));
+const TitleCard = defineAsyncComponent(() => import("@/components/Home/TitleCard.vue"));
 
 </script>
 
 <template>
   <div style="display: flex; ">
     <AsideBar />
-    <div style="width: 100%;">
+    <div style="width: 100%; min-width: 500px;">
       <div>
         <TitleCard />
       </div>
