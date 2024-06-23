@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   // 初始定义
-  const isLogin = ref(false);
+  const isLogin = ref(true);
   const userName = ref("");
   const userPermission = ref("none");
   const userInfo = reactive({});
@@ -18,15 +18,15 @@ export const useAuthStore = defineStore('auth', () => {
   const setIsLogin = (input) => isLogin.value = Boolean(input);
   const setUserName = (input) => userName.value = input;
   const setUserPermission = (input) => userPermission.value = input;
-  const setUserInfo = (input) => {
+  const setUserInfo = (key, value) => userInfo[key] = value;
+  const coverUserInfo = (input) => {
     Object.keys(getUserInfo()).forEach(key => delete userInfo[key]);
     Object.keys(input).forEach(key => userInfo[key] = input[key]);
   }
-  const updateUserInfo = (key, value) => userInfo[key] = value;
 
   return {
     isLogin, userName, userPermission, userInfo,
     getIsLogin, getUserName, getUserPermission, getUserInfo,
-    setIsLogin, setUserName, setUserPermission, setUserInfo, updateUserInfo,
+    setIsLogin, setUserName, setUserPermission, setUserInfo, coverUserInfo,
   };
 })

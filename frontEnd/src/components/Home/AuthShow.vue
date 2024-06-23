@@ -1,9 +1,9 @@
 <template>
-  <Toast />
   <div AuthCardContainer @click="mainClick">
     <IconUser />
     <span>未登录</span>
   </div>
+
   <Dialog v-model:visible="dialogShow" modal header="认证界面" :style="{ maxWidth: '50vw', minWidth: `350px` }">
     <template #header>
       <div>
@@ -12,85 +12,189 @@
     </template>
     <!-- 已经登录显示的界面 -->
     <div AuthCardDialogAuthed v-if="authStore.isLogin">
-
-
-
+      <div>
+        <table>
+          <hr>
+        </table>
+      </div>
+      <div>
+        <Button size="small" @click="renewInfo">刷新</Button>
+        <Divider layout="vertical" />
+        <Button size="small" @click="logoutClick">登出</Button>
+      </div>
     </div>
 
     <!-- 未登录显示的界面 -->
     <div AuthCardDialogUnauthed v-else>
-      <div style="display: flex; flex-direction: column; gap: 25px; justify-content: center;">
+      <div>
         <FloatLabel>
-          <InputText size="small" v-model:modelValue="userNameInput" style="width: 100%;" />
+          <InputText size="small" v-model="userNameInput" placeholder="必填" />
           <label>账户名</label>
         </FloatLabel>
         <FloatLabel>
-          <InputText size="small" type="password" v-model:modelValue="userPasswordInput" style="width: 100%;" />
+          <InputText size="small" type="password" v-model="userPasswordInput" placeholder="必填" />
           <label>密码</label>
+        </FloatLabel>
+        <FloatLabel v-if="adminKeyInputShow">
+          <InputText size="small" v-model="adminKeyInput" placeholder="选填" />
+          <label>管理员秘钥</label>
         </FloatLabel>
       </div>
       <br>
-      <div style="display: flex; width: 100%; justify-content: center;">
+      <div>
         <Button size="small" @click="registClick" severity="secondary">注册</Button>
         <Divider layout="vertical" />
         <Button size="small" @click="loginClick">登录</Button>
       </div>
     </div>
-
-    <div style="display: none;">
-      <span>{{ userNameInput }}</span>
-      <br>
-      <span>{{ userPasswordInput }}</span>
-    </div>
   </Dialog>
 </template>
 
 <script setup>
-import IconUser from '@/components/icons/IconUser.vue';
-import FloatLabel from "primevue/floatlabel";
-import Dialog from 'primevue/dialog';
+// 静态引入
 import { useToast } from 'primevue/usetoast';
 import md5 from "md5";
 import axios from "axios";
 import { useAuthStore } from "@/stores/auth.js";
 import { ref } from 'vue';
+import { defineAsyncComponent } from 'vue';
+
+// 动态引入
+const IconUser = defineAsyncComponent(() => import("@/components/icons/IconUser.vue"));
+const FloatLabel = defineAsyncComponent(() => import("primevue/floatlabel"));
+const Dialog = defineAsyncComponent(() => import("primevue/dialog"));
 
 // 初始化
 const authStore = useAuthStore();
 const dialogShow = ref(false);
 const userNameInput = ref("");
+const adminKeyInputShow = ref(false);
+const adminKeyInput = ref("");
 const userPasswordInput = ref("");
 const toast = useToast();
 
 // 通用函数
-const checkEmptyField = () => {
-  // 检查账号和密码是否为空 
-  // 为空返回True
-  return userNameInput.value.length == 0 || userPasswordInput.value.length == 0;
-}
+const checkEmptyField = () => userNameInput.value.length == 0 || userPasswordInput.value.length == 0;
+const md5Password = () => md5(md5(userPasswordInput.value + "DAOLUOLTS").toString());
 
 // 外部显示被点击，打开登录或信息界面
-const mainClick = () => dialogShow.value = true;
+const mainClick = () => {
+  // 显示认证界面
+  dialogShow.value = true;
+  // 关闭管理员秘钥显示
+  adminKeyInputShow.value = false;
+  // 清空信息框
+  userNameInput.value = "";
+  userPasswordInput.value = "";
+  adminKeyInput.value = "";
+}
 
 // 注册按钮被点击
 const registClick = () => {
-  if (checkEmptyField()) return toast.add({ severity: 'error', summary: '错误', detail: '账号或密码不能为空', life: 3000 })
+  if (checkEmptyField()) return toast.add({ severity: 'error', summary: '错误', detail: '账号或密码不能为空', life: 3000 });
 
+  if (!adminKeyInputShow.value) return adminKeyInputShow.value = true;
+
+
+  axios("/auth/regist", {
+    method: "post", data: {
+      userName: userNameInput.value,
+      userPassword: md5Password(),
+      adminKey: adminKeyInput.value
+    }
+  }).then(axiosRes => {
+    // 返回的数据
+    /**
+     * {
+     *  userName String,
+     *  userPermission String,
+     *  userInfo: {},
+     * }
+     */
+    const data = axiosRes.data;
+    authStore.setUserName(data.userName);
+    authStore.setUserPermission(data.userPermission);
+    authStore.coverUserInfo(data.userInfo);
+    authStore.setIsLogin(true);
+    // 完成登录
+  }).catch(axiosErr => {
+    toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+  })
 }
 
 // 登录按钮被点击
 const loginClick = () => {
-  if (checkEmptyField()) return toast.add({ severity: 'error', summary: '错误', detail: '账号或密码不能为空', life: 3000 })
+  if (checkEmptyField()) return toast.add({ severity: 'error', summary: '错误', detail: '账号或密码不能为空', life: 3000 });
 
-  const md5Password = md5(md5(userPasswordInput.value + "DAOLUOLTS"));
   axios("/auth/login", {
     method: "post", data: {
       userName: userNameInput.value,
-      userPassword: userPasswordInput.value
+      userPassword: md5Password()
     }
   }).then(axiosRes => {
-    
+    // 返回的数据
+    /**
+     * {
+     *  userName String,
+     *  userPermission String,
+     *  userInfo: {}
+     * }
+     */
+    const data = axiosRes.data;
+    authStore.setUserName(data.userName);
+    authStore.setUserPermission(data.userPermission);
+    authStore.coverUserInfo(data.userInfo);
+    authStore.setIsLogin(true);
+    // 完成登录
+  }).catch(axiosErr => {
+    toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
   })
+}
+
+// 登出按钮被点击
+const logoutClick = () => {
+  if (!authStore.getIsLogin()) return toast.add({ severity: "error", summary: "错误", detail: "当前已经是未登录状态，请刷新页面尝试修正显示。", life: 3000 });
+
+  axios("/auth/logout", { method: "post" })
+    .then(axiosRes => {
+      const data = axiosRes.data;
+
+      authStore.setIsLogin(false);
+      authStore.setUserName("");
+      authStore.setUserPermission("none");
+      authStore.coverUserInfo({});
+
+      toast.add({ severity: "success", summary: "成功", detail: "完成登出，现在是未登录状态。", life: 3000 });
+      location.reload();
+    })
+    .catch(axiosErr => {
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+    })
+}
+
+// 刷新账户信息按钮被点击
+const renewInfo = () => {
+  if (!authStore.getIsLogin()) return toast.add({ severity: "error", summary: "错误", detail: "当前已经是未登录状态，请刷新页面尝试修正显示。", life: 3000 });
+
+  axios("/auth/checkLogin", { method: "post" })
+    .then(axiosRes => {
+      // 返回的数据
+      /**
+       * {
+       *  userName String,
+       *  userPermission String,
+       *  userInfo: {}
+       * }
+       */
+      const data = axiosRes.data;
+      authStore.setUserName(data.userName);
+      authStore.setUserPermission(data.userPermission);
+      authStore.coverUserInfo(data.userInfo);
+      authStore.setIsLogin(true);
+    })
+    .catch(axiosErr => {
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+    })
 }
 </script>
 
@@ -114,6 +218,7 @@ div[AuthCardContainer] {
 div[AuthCardContainer]:hover {
   background-color: rgb(131, 131, 131);
   color: rgb(255, 255, 255);
+  cursor: pointer;
 }
 
 div[AuthCardContainer] * {
@@ -140,5 +245,23 @@ div[AuthCardContainer] span {
 div[AuthCardDialogAuthed],
 div[AuthCardDialogUnauthed] {
   margin-top: 20px;
+}
+
+div[AuthCardDialogUnauthed]>div:nth-of-type(1) {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  justify-content: center;
+}
+
+div[AuthCardDialogUnauthed]>div:nth-of-type(1)>span>input {
+  width: 100%;
+}
+
+div[AuthCardDialogUnauthed]>div:nth-of-type(2),
+div[AuthCardDialogAuthed]>div:nth-of-type(2) {
+  display: flex;
+  width: 100%;
+  justify-content: center;
 }
 </style>

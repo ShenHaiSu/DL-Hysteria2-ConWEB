@@ -1,18 +1,17 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-
 import { ref, reactive, defineAsyncComponent } from 'vue';
-// import AsideBar from "@/components/Home/AsideBar.vue"
-// import TitleCard from "@/components/Home/TitleCard.vue";
 
 // 动态引入
 const AsideBar = defineAsyncComponent(() => import("@/components/Home/AsideBar.vue"));
 const TitleCard = defineAsyncComponent(() => import("@/components/Home/TitleCard.vue"));
+const Toast = defineAsyncComponent(() => import("primevue/toast"));
 
 </script>
 
 <template>
   <div style="display: flex; ">
+    <Toast />
     <AsideBar />
     <div style="width: 100%; min-width: 500px;">
       <div>
