@@ -13,9 +13,30 @@
     <!-- 已经登录显示的界面 -->
     <div AuthCardDialogAuthed v-if="authStore.isLogin">
       <div>
-        <table>
-          <hr>
+        <table style="width: 100%;">
+          <tbody>
+            <tr>
+              <td>用户名</td>
+              <td>{{ authStore.getUserName() }}</td>
+            </tr>
+            <tr>
+              <td>权限级别</td>
+              <td>{{ authStore.getUserPermission() }}</td>
+            </tr>
+            <tr>
+              <td colspan="2" >
+                <Divider style="width: 100%;" />
+              </td>
+            </tr>
+            <template v-for="item in userInfoKeys">
+              <tr>
+                <td>{{ item }}</td>
+                <td>{{ authStore.getUserInfo()[item] }}</td>
+              </tr>
+            </template>
+          </tbody>
         </table>
+        <br><br>
       </div>
       <div>
         <Button size="small" @click="renewInfo">刷新</Button>
@@ -58,6 +79,7 @@ import axios from "axios";
 import { useAuthStore } from "@/stores/auth.js";
 import { ref } from 'vue';
 import { defineAsyncComponent } from 'vue';
+import { computed } from 'vue';
 
 // 动态引入
 const IconUser = defineAsyncComponent(() => import("@/components/icons/IconUser.vue"));
@@ -88,6 +110,11 @@ const mainClick = () => {
   userPasswordInput.value = "";
   adminKeyInput.value = "";
 }
+
+const userInfoKeys = computed(() => {
+  console.log(Object.keys(authStore.getUserInfo()));
+  return Object.keys(authStore.getUserInfo());
+})
 
 // 注册按钮被点击
 const registClick = () => {

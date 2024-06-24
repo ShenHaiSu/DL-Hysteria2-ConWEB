@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 
 export const useAuthStore = defineStore('auth', () => {
   // 初始定义
-  const isLogin = ref(true);
+  const isLogin = ref(false);
   const userName = ref("");
   const userPermission = ref("none");
   const userInfo = reactive({});
