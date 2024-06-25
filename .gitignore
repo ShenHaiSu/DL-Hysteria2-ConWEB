@@ -1,6 +1,11 @@
 # 后端屏蔽
 backEnd/node_modules
+backEnd/cert
+backEnd/logs
+backEnd/db
+backEnd/adminKey.json
 
 # 前端屏蔽
+frontEnd/node_modules
 
 # 其他屏蔽

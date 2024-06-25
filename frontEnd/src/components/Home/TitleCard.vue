@@ -8,7 +8,6 @@
 
 <script setup>
 import Card from "primevue/card";
-import { watch } from "vue";
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router";
 
