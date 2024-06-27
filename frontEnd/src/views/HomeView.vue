@@ -1,8 +1,16 @@
 <script setup>
+// 静态引入
 import { ref } from 'vue';
-import FloatLabel from "primevue/floatlabel";
-import Knob from 'primevue/knob';
-import Slider from 'primevue/slider';
+import { defineAsyncComponent } from 'vue';
+// import FloatLabel from "primevue/floatlabel";
+// import Knob from 'primevue/knob';
+// import Slider from 'primevue/slider';
+
+// 动态引入
+const Knob = defineAsyncComponent(() => import("primevue/knob"))
+const FloatLabel = defineAsyncComponent(() => import("primevue/floatlabel"))
+const Slider = defineAsyncComponent(() => import("primevue/slider"))
+
 
 const inputValue = ref("");
 const knobValue = ref(0);

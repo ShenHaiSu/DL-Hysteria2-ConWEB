@@ -6,10 +6,17 @@ const tools = require("./tools.js");
 const app = express();
 const fs = require("node:fs");
 const https = require('node:https');
+const bodyParser = require("body-parser")
+const cookieParser = require('cookie-parser');
 
 
 // 压缩
 app.use(compression());
+
+// body格式化中间件
+app.use(bodyParser.json());
+// cookie格式化中间件
+app.use(cookieParser());
 
 // 访问记录
 app.use((req, res, next) => {
@@ -20,8 +27,12 @@ app.use((req, res, next) => {
 // 检查文件夹是否存在
 const folderList = ["logs", "cert", "db", "node_modules"];
 tools.checkFolderList(folderList);
+
 // 检查是否已经存在adminKey
 let adminKey = tools.getAdminKey();
+
+// 挂载本地db文件
+tools.db_init();
 
 // 挂载分支路由
 const { router: apiMain } = require("./router/main.js");

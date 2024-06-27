@@ -1,7 +1,7 @@
 <template>
   <div AuthCardContainer @click="mainClick">
     <IconUser />
-    <span>未登录</span>
+    <span>{{ authStore.getIsLogin() ? authStore.getUserName() : "未登录" }}</span>
   </div>
 
   <Dialog v-model:visible="dialogShow" modal header="认证界面" :style="{ maxWidth: '50vw', minWidth: `350px` }">
@@ -24,7 +24,7 @@
               <td>{{ authStore.getUserPermission() }}</td>
             </tr>
             <tr>
-              <td colspan="2" >
+              <td colspan="2">
                 <Divider style="width: 100%;" />
               </td>
             </tr>
@@ -49,11 +49,12 @@
     <div AuthCardDialogUnauthed v-else>
       <div>
         <FloatLabel>
-          <InputText size="small" v-model="userNameInput" placeholder="必填" />
+          <InputText size="small" @keydown="inputKeyDown" v-model="userNameInput" placeholder="必填" />
           <label>账户名</label>
         </FloatLabel>
         <FloatLabel>
-          <InputText size="small" type="password" v-model="userPasswordInput" placeholder="必填" />
+          <InputText size="small" type="password" @keydown="inputKeyDown" v-model="userPasswordInput"
+            placeholder="必填" />
           <label>密码</label>
         </FloatLabel>
         <FloatLabel v-if="adminKeyInputShow">
@@ -80,6 +81,8 @@ import { useAuthStore } from "@/stores/auth.js";
 import { ref } from 'vue';
 import { defineAsyncComponent } from 'vue';
 import { computed } from 'vue';
+import { onMounted } from 'vue';
+import Toast from 'primevue/toast';
 
 // 动态引入
 const IconUser = defineAsyncComponent(() => import("@/components/icons/IconUser.vue"));
@@ -116,6 +119,21 @@ const userInfoKeys = computed(() => {
   return Object.keys(authStore.getUserInfo());
 })
 
+onMounted(() => {
+  axios("/auth/checkLogin", { method: "post" })
+    .then(axiosRes => {
+      const data = axiosRes.data;
+      authStore.setUserName(data.userName);
+      authStore.setUserPermission(data.userPermission);
+      authStore.coverUserInfo(data.userInfo);
+      authStore.setIsLogin(true);
+      toast.add({ severity: "success", summary: "身份验证", detail: "已通过身份验证，欢迎回来：" + data.userName, life: 3000 });
+    })
+    .catch(() => {
+      toast.add({ severity: "error", summary: "当前未登录", detail: "请先登录", life: 3000 });
+    })
+})
+
 // 注册按钮被点击
 const registClick = () => {
   if (checkEmptyField()) return toast.add({ severity: 'error', summary: '错误', detail: '账号或密码不能为空', life: 3000 });
@@ -145,7 +163,7 @@ const registClick = () => {
     authStore.setIsLogin(true);
     // 完成登录
   }).catch(axiosErr => {
-    toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+    toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
   })
 }
 
@@ -173,8 +191,10 @@ const loginClick = () => {
     authStore.coverUserInfo(data.userInfo);
     authStore.setIsLogin(true);
     // 完成登录
+    toast.add({ severity: "success", summary: "成功", detail: data.msg, life: 3000 });
+    dialogShow.value = false;
   }).catch(axiosErr => {
-    toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+    toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
   })
 }
 
@@ -195,7 +215,7 @@ const logoutClick = () => {
       location.reload();
     })
     .catch(axiosErr => {
-      toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
     })
 }
 
@@ -218,10 +238,16 @@ const renewInfo = () => {
       authStore.setUserPermission(data.userPermission);
       authStore.coverUserInfo(data.userInfo);
       authStore.setIsLogin(true);
+      toast.add({ severity: "success", summary: "成功", detail: "已收到服务器下发的新Session", life: 3000 });
     })
     .catch(axiosErr => {
-      toast.add({ severity: "error", summary: "错误", detail: axiosErr, life: 3000 });
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
     })
+}
+
+// 输入框按键按下事件
+const inputKeyDown = (event) => {
+  if (event.key == "Enter") return loginClick();
 }
 </script>
 
