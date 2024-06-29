@@ -12,7 +12,7 @@
 
 <script setup>
 // 静态引入
-import { ref, defineAsyncComponent } from 'vue';
+import { ref, defineAsyncComponent, onMounted } from 'vue';
 import axios from "axios";
 import { useToast } from 'primevue/usetoast';
 import { useSystemInfoStore } from "@/stores/systemInfo.js";
@@ -26,7 +26,7 @@ const systemInfoStore = useSystemInfoStore();
 const cpuAramComp = ref(null);
 
 // 每五秒获取一次面板系统数据
-setInterval(() => {
+const targetUpdate = () => {
   axios.get("/systemInfo/allInfo")
     .then(axiosRes => {
       const data = axiosRes.data;
@@ -36,13 +36,22 @@ setInterval(() => {
       systemInfoStore.set_ipInfo(data.ipInfo);
     })
     .then(() => {
-      // 拉起子组件更新
-      cpuAramComp.value.updateInfo(systemInfoStore.get_cpuInfo(), systemInfoStore.get_ramInfo());
+      try {
+        // 拉起子组件更新
+        cpuAramComp.value.updateInfo();
+      } catch (err) {
+        console.error(err);
+      }
     })
     .catch(axiosErr => {
       toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
     })
-}, 10 * 1000);
+}
+
+setInterval(targetUpdate, 10 * 1000);
+onMounted(() => {
+  targetUpdate();
+})
 
 </script>
 

@@ -1,11 +1,14 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import { ref, reactive, defineAsyncComponent } from 'vue';
+import { RouterLink, RouterView,useRoute } from 'vue-router'
+import { ref, reactive, defineAsyncComponent, KeepAlive } from 'vue';
 
 // 动态引入
 const AsideBar = defineAsyncComponent(() => import("@/components/common/AsideBar.vue"));
 const TitleCard = defineAsyncComponent(() => import("@/components/common/TitleCard.vue"));
 const Toast = defineAsyncComponent(() => import("primevue/toast"));
+
+// 初始化
+const route = useRoute();
 
 </script>
 
@@ -18,7 +21,12 @@ const Toast = defineAsyncComponent(() => import("primevue/toast"));
         <TitleCard />
       </div>
       <div class="mainContainer">
-        <RouterView />
+      <RouterView v-slot="{ Component }">  
+        <KeepAlive>
+          <component :is="Component" v-if="route.meta.keepAlive"  />
+        </KeepAlive>
+          <component :is="Component" v-if="!route.meta.keepAlive"  />
+      </RouterView>
       </div>
     </div>
   </div>

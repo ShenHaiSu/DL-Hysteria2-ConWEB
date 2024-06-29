@@ -56,7 +56,7 @@ const menuContent = reactive([
   },
   {
     label: "关于",
-    command: () => router.push("/About"),
+    command: () => router.push("/about"),
   },
 ]);
 

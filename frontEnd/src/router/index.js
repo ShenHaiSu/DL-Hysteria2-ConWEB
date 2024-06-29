@@ -9,15 +9,17 @@ const router = createRouter({
       name: 'home',
       component: () => import("@/views/HomeView.vue"),
       meta: {
-        describe: "主信息显示板"
+        describe: "主信息显示板",
+        keepAlive: true
       },
     },
     {
       path: '/about',
       name: 'about',
       component: () => import('@/views/AboutView.vue'),
-      meta:{
-        describe:"了解一下这个项目"
+      meta: {
+        describe: "了解一下这个项目",
+        keepAlive: false
       }
     }
   ]

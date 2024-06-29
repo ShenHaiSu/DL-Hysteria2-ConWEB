@@ -15,6 +15,9 @@
       </Card>
     </div>
 
+    <div>
+      <InputText v-model="inputText"/>
+    </div>
   </div>
 </template>
 
@@ -25,6 +28,10 @@ import { defineAsyncComponent, ref, reactive } from 'vue';
 const Card = defineAsyncComponent(() => import("primevue/card"));
 
 const gotoGithubProject = () => window.open('https://github.com/ShenHaiSu/DL-Hysteria2-ConWEB');
+
+const inputText = ref("");
+
+
 </script>
 
 <style></style>
