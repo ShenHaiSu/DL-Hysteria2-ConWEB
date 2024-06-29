@@ -21,7 +21,9 @@
             </tr>
             <tr>
               <td>权限级别</td>
-              <td>{{ authStore.getUserPermission() }}</td>
+              <td>
+                <Tag :value="authStore.getUserPermission()" :severity="getTagSeverity()" rounded></Tag>
+              </td>
             </tr>
             <tr>
               <td colspan="2">
@@ -82,12 +84,12 @@ import { ref } from 'vue';
 import { defineAsyncComponent } from 'vue';
 import { computed } from 'vue';
 import { onMounted } from 'vue';
-import Toast from 'primevue/toast';
 
 // 动态引入
 const IconUser = defineAsyncComponent(() => import("@/components/icons/IconUser.vue"));
 const FloatLabel = defineAsyncComponent(() => import("primevue/floatlabel"));
 const Dialog = defineAsyncComponent(() => import("primevue/dialog"));
+const Tag = defineAsyncComponent(() => import("primevue/tag"));
 
 // 初始化
 const authStore = useAuthStore();
@@ -248,6 +250,18 @@ const renewInfo = () => {
 // 输入框按键按下事件
 const inputKeyDown = (event) => {
   if (event.key == "Enter") return loginClick();
+}
+
+// 生成tag的重要级
+const getTagSeverity = () => {
+  switch (authStore.getUserPermission()) {
+    case "none":
+      return "";
+    case "user":
+      return "success";
+    case "admin":
+      return "danger";
+  }
 }
 </script>
 

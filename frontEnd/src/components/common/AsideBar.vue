@@ -26,12 +26,15 @@
 
 
 <script setup>
-import Menu from 'primevue/menu';
 import { onMounted } from 'vue';
 import { ref, reactive } from "vue";
-import IconWeb from "@/components/icons/IconWeb.vue"
 import { useRouter } from 'vue-router';
-import AuthShow from "@/components/Home/AuthShow.vue"
+import { defineAsyncComponent } from 'vue';
+
+// 动态引入
+const AuthShow = defineAsyncComponent(() => import("@/components/common/AuthShow.vue"));
+const IconWeb = defineAsyncComponent(() => import("@/components/icons/IconWeb.vue"));
+const Menu = defineAsyncComponent(() => import("primevue/menu"));
 
 // 初始化
 const router = useRouter();

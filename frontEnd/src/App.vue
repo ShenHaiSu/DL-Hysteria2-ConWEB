@@ -3,8 +3,8 @@ import { RouterLink, RouterView } from 'vue-router'
 import { ref, reactive, defineAsyncComponent } from 'vue';
 
 // 动态引入
-const AsideBar = defineAsyncComponent(() => import("@/components/Home/AsideBar.vue"));
-const TitleCard = defineAsyncComponent(() => import("@/components/Home/TitleCard.vue"));
+const AsideBar = defineAsyncComponent(() => import("@/components/common/AsideBar.vue"));
+const TitleCard = defineAsyncComponent(() => import("@/components/common/TitleCard.vue"));
 const Toast = defineAsyncComponent(() => import("primevue/toast"));
 
 </script>
