@@ -51,6 +51,19 @@ const chartData = ref({
 })
 
 
+const updateInfo = () => {
+  // 新使用
+  const new_cpuUsage = Number((systemInfoStore.cpuInfo.usage * 100).toFixed(1));
+  const new_ramUsage = Number((systemInfoStore.ramInfo.usedPercentage * 100).toFixed(1));
+
+  // 挂载Knob显示
+  cpuUsageShow.value = new_cpuUsage;
+  ramUsageShow.value = new_ramUsage;
+
+  // 刷新图表
+  reDrawChart();
+}
+
 const reDrawChart = () => {
   // 删除滞后数据
   if (chartData.value.labels.length == 30) {
@@ -73,19 +86,6 @@ const reDrawChart = () => {
 
   // 拉起图表重绘
   chartRefresh();
-}
-
-const updateInfo = () => {
-  // 新使用
-  const new_cpuUsage = Number((systemInfoStore.cpuInfo.usage * 100).toFixed(1));
-  const new_ramUsage = Number((systemInfoStore.ramInfo.usedPercentage * 100).toFixed(1));
-
-  // 挂载Knob显示
-  cpuUsageShow.value = new_cpuUsage;
-  ramUsageShow.value = new_ramUsage;
-
-  // 刷新图表
-  reDrawChart();
 }
 
 const chartRefresh = () => {

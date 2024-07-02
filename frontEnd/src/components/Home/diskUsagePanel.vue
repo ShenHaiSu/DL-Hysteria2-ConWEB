@@ -5,11 +5,12 @@
     </div>
     <div>
       <template v-for="(diskUsage, diskName ) in systemInfoStore.diskInfo">
-        <div style="display: flex; flex-wrap: wrap; text-align: start; ">
-          <div style="flex: 3; min-width: 150px; "> {{ diskName }}&nbsp;&nbsp;&nbsp;&nbsp; {{ diskUsage['used'] }}GB / {{
-        diskUsage['total'] }}GB
+        <div>
+          <!-- <div style="display: flex; flex-wrap: wrap; text-align: start; "> -->
+          <div style="min-width: 150px; width: 100%; text-align: start"> {{ diskName }}&nbsp;&nbsp;&nbsp;&nbsp; {{ diskUsage['used'] }}GB / {{
+            diskUsage['total'] }}GB
           </div>
-          <div style="flex: 14; min-width: 450px;">
+          <div style="min-width: 450px;">
             <ProgressBar :value="diskUsage.usedPercentage * 100"></ProgressBar>
           </div>
         </div>

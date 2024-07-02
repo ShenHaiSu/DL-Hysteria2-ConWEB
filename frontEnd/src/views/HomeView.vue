@@ -5,7 +5,7 @@
     </div>
     <div style="display: flex; flex-wrap: wrap; ">
       <diskUsagePanel style="flex: 4; min-width: 600px;" ref="diskComp" />
-      <ipAddressPanel style="flex: 1; min-width: 250px;" ref="ipAddressComp" />
+      <ipAddressPanel style="flex: 2; min-width: 250px;" ref="ipAddressComp" />
     </div>
 
   </div>
