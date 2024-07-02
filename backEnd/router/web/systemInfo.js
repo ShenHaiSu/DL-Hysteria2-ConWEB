@@ -158,11 +158,11 @@ const get_diskInfo = async () => {
     const result = {};
     for (let i = 0; i < data.length; i++) {
       const disk = data[i];
-      result[disk.fs] = {
-        total: Number((disk.size / 1024 / 1024 / 1024).toFixed(2)),
-        used: Number((disk.used / 1024 / 1024 / 1024).toFixed(2)),
-        free: Number(((disk.size - disk.used) / 1024 / 1024 / 1024).toFixed(2)),
-      }
+      const total = Number((disk.size / 1024 / 1024 / 1024).toFixed(2));
+      const used = Number((disk.used / 1024 / 1024 / 1024).toFixed(2));
+      const free = Number(((total - used)).toFixed(2));
+      const usedPercentage = Number(((used / total)).toFixed(2));
+      result[disk.fs] = { total, used, free, usedPercentage };
     }
     return result;
   } catch (err) {

@@ -46,13 +46,17 @@ const menuContent = reactive([
     label: "主面板",
     command: () => router.push("/"),
   },
+  // {
+  //   label: "文档",
+  //   items: [
+  //     { label: "文档-1", command: () => alert("文档1"), data: "Asdasd" },
+  //     { label: "文档-2" },
+  //     { label: "文档-3" },
+  //   ]
+  // },
   {
-    label: "文档",
-    items: [
-      { label: "文档-1", command: () => alert("文档1"), data: "Asdasd" },
-      { label: "文档-2" },
-      { label: "文档-3" },
-    ]
+    label:"服务器控制面",
+    command:() => router.push("/serverConf")
   },
   {
     label: "关于",

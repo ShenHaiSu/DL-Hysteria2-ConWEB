@@ -14,10 +14,6 @@
         </template>
       </Card>
     </div>
-
-    <div>
-      <InputText v-model="inputText"/>
-    </div>
   </div>
 </template>
 

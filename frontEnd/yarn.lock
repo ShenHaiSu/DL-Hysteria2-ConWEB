@@ -163,6 +163,18 @@
   resolved "https://registry.yarnpkg.com/@primeuix/styled/-/styled-0.0.1.tgz#b17d75d46b954eaefc0972768c1fd23ef7c8342a"
   integrity sha512-0psCSZr3906UwC4mTl2ol4aDoLvdbM0ekJFLKvCvC2oQ9z2YZhmUOVZQNNxBW34mChDzZYcAcRWXADQz3z5lBg==
 
+"@primeuix/styled@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@primeuix/styled/-/styled-0.0.5.tgz#430d06554470fddc28814059d76e63c9c21535b9"
+  integrity sha512-pVoGn/uPkVm/DyF3TR3EmH/pL/dP4nR42FcYbVduFq9VfO3KVeOEqvcCULHXos66RZO9MCbCFUoLy6ctf9GUGQ==
+  dependencies:
+    "@primeuix/utils" "^0.0.5"
+
+"@primeuix/utils@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@primeuix/utils/-/utils-0.0.5.tgz#4bb032a3338fba51c1a2df8010d91973b6fa2520"
+  integrity sha512-ntUiUgtRtkF8KuaxHffzhYxQxoXk6LAPHm7CVlFjdqS8Rx8xRkLkZVyo84E+pO2hcNFkOGVP/GxHhQ2s94O8zA==
+
 "@primevue/auto-import-resolver@^4.0.0-beta.5":
   version "4.0.0-beta.5"
   resolved "https://registry.yarnpkg.com/@primevue/auto-import-resolver/-/auto-import-resolver-4.0.0-beta.5.tgz#c77bf4b9519835ca518c5fd58acd40696aa1d928"
