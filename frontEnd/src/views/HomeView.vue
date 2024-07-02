@@ -33,6 +33,8 @@ const ipAddressComp = ref(null);
 
 // 每五秒获取一次面板系统数据
 const targetUpdate = () => {
+  if (!authStore.isLogin) return;
+
   axios.get("/systemInfo/allInfo")
     .then(axiosRes => {
       const data = axiosRes.data;
