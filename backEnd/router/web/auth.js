@@ -18,7 +18,14 @@ class Account {
   userPassword;
   userPermission;
   session = "";
-  userInfo = {};
+  userInfo = {
+    hy2Key: tools.genRandomString(30),
+    txSpeed: 5242880, // 默认 5mb/s
+    maxOnline: 3, // 默认最多三设备在线
+    nowOnline: 0, // 当前设备在线数，这个交给自动更新维护
+    accessServer: [], // 有权使用的服务器
+    blockServer: [], // 无权使用的服务器
+  };
 }
 
 // 注册接口
@@ -126,6 +133,26 @@ router.post("/checkLogin", (req, res, next) => {
     });
     return;
   }
+})
+
+// 获取所有账号信息接口
+router.get("/allAccount", (req, res, next) => {
+  // 检查登录状态
+  if (!req.cookies['session'] || req.cookies['session'] == "") {
+    res.status(500);
+    res.send({ error: true, msg: "无权" });
+    return;
+  }
+  // 检查权限
+  const targetAccountIndex = db_account.findIndex(account => account.session == req.cookies['session']);
+  if (targetAccountIndex == -1 || db_account[targetAccountIndex].userPermission != "admin") {
+    res.status(500);
+    res.send({ error: true, msg: "无权" });
+    return;
+  }
+  // 发送请求体
+  res.status(200);
+  res.send(db_account);
 })
 
 module.exports.router = router;

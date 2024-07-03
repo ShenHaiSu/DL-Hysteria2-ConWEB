@@ -7,7 +7,7 @@
       <template v-for="(diskUsage, diskName ) in systemInfoStore.diskInfo">
         <div>
           <!-- <div style="display: flex; flex-wrap: wrap; text-align: start; "> -->
-          <div style="min-width: 150px; width: 100%; text-align: start"> {{ diskName }}&nbsp;&nbsp;&nbsp;&nbsp; {{ diskUsage['used'] }}GB / {{
+          <div style="min-width: 150px; width: 100%; text-align: start"> {{ diskName }}&nbsp;&nbsp;{{ diskUsage['used'] }}GB / {{
             diskUsage['total'] }}GB
           </div>
           <div style="min-width: 450px;">

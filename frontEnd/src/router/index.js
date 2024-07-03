@@ -25,7 +25,13 @@ const router = createRouter({
       meta: {
         describe: "登记、删除、修改服务器信息"
       }
-
+    },{
+      path:"/accountConf",
+      name:"账户控制面",
+      component:() => import("@/views/AccountConf.vue"),
+      meta:{
+        describe:"增添、修改、删除面板的账户相关信息"
+      }
     }
   ]
 })

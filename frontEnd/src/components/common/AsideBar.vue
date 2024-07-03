@@ -55,8 +55,12 @@ const menuContent = reactive([
   //   ]
   // },
   {
-    label:"服务器控制面",
-    command:() => router.push("/serverConf")
+    label: "服务器控制面",
+    command: () => router.push("/serverConf")
+  },
+  {
+    label: "账户控制面",
+    command: () => router.push("/accountConf")
   },
   {
     label: "关于",
