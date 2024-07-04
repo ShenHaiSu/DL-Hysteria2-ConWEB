@@ -150,9 +150,15 @@ router.get("/allAccount", (req, res, next) => {
     res.send({ error: true, msg: "无权" });
     return;
   }
+
+  // 过滤结果
+  const sendObj = [];
+  db_account.forEach(account => sendObj.push(JSON.parse(JSON.stringify(account))));
+  sendObj.forEach(account => delete account.userPassword);
+
   // 发送请求体
   res.status(200);
-  res.send(db_account);
+  res.send(sendObj);
 })
 
 module.exports.router = router;

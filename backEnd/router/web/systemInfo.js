@@ -20,7 +20,10 @@ const runtimeData = {
     sys: 0,
     idle: 0,
     irq: 0
-  }
+  },
+  timeLabels: [],
+  cpuUsageHistory: [],
+  ramUsageHistory: [],
 }
 
 // 权限检查
@@ -53,6 +56,10 @@ router.get("/allInfo", async (req, res, next) => {
 
     res.status(200);
     res.send({ error: false, msg: "获取成功", cpuInfo, ramInfo, diskInfo, ipInfo });
+
+    // 更新到占用历史
+    updateUsageHistory("all", cpuInfo, ramInfo);
+
   } catch (errObj) {
     res.status(500);
     res.send({ error: true, msg: "服务器内部错误" + JSON.stringify(errObj) });
@@ -61,22 +68,28 @@ router.get("/allInfo", async (req, res, next) => {
 
 // 获取CPU信息
 router.get("/cpuInfo", (req, res, next) => {
+  const cpuInfo = get_cpuInfo();
   res.status(200);
   res.send({
     error: false,
     msg: "获取成功",
-    ...get_cpuInfo()
+    ...cpuInfo
   });
+  // 更新到占用历史
+  updateUsageHistory("cpu", cpuInfo, null);
 })
 
 // 获取内存信息
 router.get("/ramInfo", (req, res, next) => {
+  const ramInfo = get_ramInfo();
   res.status(200);
   res.send({
     error: false,
     msg: "获取成功",
-    ...get_ramInfo()
-  })
+    ...ramInfo
+  });
+  // 更新到占用历史
+  updateUsageHistory("ram", null, ramInfo);
 })
 
 // 获取硬盘信息
@@ -96,6 +109,18 @@ router.get("/diskInfo", async (req, res, next) => {
 router.get("/ipInfo", (req, res, next) => {
   res.status(200);
   res.send({ error: false, msg: "获取成功", ipAddress: get_ipInfo() });
+})
+
+// 获取服务端历史占用数据
+router.get("/cpuAramHistory", (req, res, next) => {
+  res.status(200);
+  res.send({
+    error: false,
+    msg: "获取成功",
+    timeLabels: runtimeData.timeLabels,
+    cpuInfo: runtimeData.cpuUsageHistory,
+    ramInfo: runtimeData.ramUsageHistory,
+  });
 })
 
 
@@ -181,6 +206,28 @@ const get_ipInfo = () => {
   }
 
   return result;
+}
+
+// 更新历史占用信息
+const updateUsageHistory = (tag, cpuInfo, ramInfo) => {
+  // 生成时间文本
+  const date = new Date();
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  const timeString = `${hours}:${minutes}:${seconds}`;
+
+  // 检测已有数据长度
+  if (runtimeData.timeLabels.length == 10) {
+    runtimeData.timeLabels.shift();
+    runtimeData.cpuUsageHistory.shift();
+    runtimeData.ramUsageHistory.shift();
+  }
+
+  // 提交新数据
+  runtimeData.timeLabels.push(timeString);
+  runtimeData.cpuUsageHistory.push(tag == "ram" ? 0 : Number((cpuInfo.usage / cpuInfo.total).toFixed(2)));
+  runtimeData.ramUsageHistory.push(tag == "cpu" ? 0 : ramInfo.usedPercentage);
 }
 
 module.exports.router = router;

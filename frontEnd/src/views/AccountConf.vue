@@ -1,20 +1,26 @@
 <template>
   <div class="baseContainer">
-    <div>
+    <div style="--p-datatable-header-cell-padding: 10px;">
       <DataTable :value="accountListData">
         <!-- 数据表头 -->
         <template #header>
-          <div style="display: flex; align-items: center;">
-            <span style="flex: 2;"> </span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <div style="flex: 8;display: flex;gap: 10px;">
+              <InputText v-model="searchText" placeholder="搜索用户名" @keydown.enter="searchHandle" />
+              <Button @click="searchHandle">
+                <IconSearch style="font-size: 20px;" />
+              </Button>
+            </div>
             <div style="flex: 30;"></div>
-            <Button @click="refreshData" style="flex:2;"> 刷新 </Button>
+            <Button @click="addNewAccount" style="flex:2;" size="small">添加</Button>
+            <Button @click="getNewData" style="flex:4;" size="small"> 刷新 </Button>
           </div>
         </template>
         <!-- 数据表体 -->
         <Column header="用户名" field="userName"></Column>
         <Column header="权限">
           <template #body="slotProps">
-            <Tag :value="slotProps.data.userPermission" :severity="genTagSerenity_1(slotProps.data.userPermission)" />
+            <Tag :value="slotProps.data.userPermission" :severity="genTagSerenity(slotProps.data.userPermission)" />
           </template>
         </Column>
         <Column header="代理连接秘钥">
@@ -22,7 +28,11 @@
             <Inplace>
               <template #display> 点击显示 </template>
               <template #content>
-                <span :title="slotProps.data.userInfo.hy2Key">{{ formatHy2Key(slotProps.data.userInfo.hy2Key) }}</span>
+                <div @click="linkKeyClick" class="linkKeyDiv">
+                  <span :title="slotProps.data.userInfo.hy2Key">{{ formatHy2Key(slotProps.data.userInfo.hy2Key)
+                    }}</span>
+                  <IconCopy />
+                </div>
               </template>
             </Inplace>
           </template>
@@ -35,19 +45,10 @@
         </Column>
         <Column header="服务器权限">
           <template #body="slotProps">
-            <Inplace>
-              <template #display> 点击显示 </template>
-              <template #content>
-                <div style="display: flex; flex-wrap: wrap; gap: 5px; max-width: 200px; --p-tag-font-size: 12px;">
-                  <template v-for="name in slotProps.data.userInfo.accessServer">
-                    <Tag :value="name" severity="success"></Tag>
-                  </template>
-                  <template v-for="name in slotProps.data.userInfo.blockServer">
-                    <Tag :value="name" severity="danger"></Tag>
-                  </template>
-                </div>
-              </template>
-            </Inplace>
+            <div style="display: flex; flex-wrap: wrap; gap: 5px; max-width: 200px; --p-tag-font-size: 12px;">
+              <Tag :value="genArrayLength(slotProps.data.userInfo.accessServer)" severity="success"></Tag>
+              <Tag :value="genArrayLength(slotProps.data.userInfo.blockServer)" severity="danger"></Tag>
+            </div>
           </template>
         </Column>
         <Column header="流量">
@@ -60,13 +61,16 @@
         </Column>
         <Column header="操作">
           <template #body="slotProps">
-            <div>
-              <Button severity="danger" size="small">删除</Button>
+            <div style="display: flex; gap: 10px;">
+              <Button @click="editHandle(slotProps.data)" security="success" size="small">编辑</Button>
+              <Button @click="deleteHandle(slotProps.data)" severity="danger" size="small">删除</Button>
             </div>
           </template>
         </Column>
-
       </DataTable>
+    </div>
+    <div>
+      <Editor />
     </div>
   </div>
 </template>
@@ -76,43 +80,76 @@
 import { defineAsyncComponent } from 'vue';
 import { ref } from 'vue';
 import axios from "axios";
-import { onActivated } from 'vue';
 import { useToast } from 'primevue/usetoast';
+import { onMounted } from 'vue';
+import IconCopy from "@/components/icons/IconCopy.vue"
+import IconSearch from "@/components/icons/IconSearch.vue"
+import { useAccountConfStore } from "@/stores/accountConf.js";
 
 // 动态引入
 const DataTable = defineAsyncComponent(() => import("primevue/datatable"));
 const Tag = defineAsyncComponent(() => import("primevue/tag"));
 const Inplace = defineAsyncComponent(() => import("primevue/inplace"));
 const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"))
+const Editor = defineAsyncComponent(() => import("@/components/accountConf/editor.vue"));
 
 // 初始化
 const accountListData = ref([]);
 const toast = useToast();
+const searchText = ref("");
+const accountConfStore = useAccountConfStore();
 
+// 生成权限tag的显示级别
+const genTagSerenity = (input) => input == 'admin' ? 'danger' : 'success';
+// 生成代理连接秘钥的显示文本
+const formatHy2Key = (input) => input ? input.length >= 10 ? input.slice(0, 10) + "..." : input : "Null";
+// 生成最大链接速率
+const genMaxLinkSpeed = (input) => input ? input / 1024 / 1024 : 0;
+// 生成连接设备限制数
+const genDevicesCount = (input) => (input.nowOnline != undefined) ? `${input.nowOnline} / ${input.maxOnline}` : "缺失";
+// 生成流量用量文本
+const genBandwidthUsed = (input) => input ? `${input.used}/${input.total}` : `0/0`;
+// 生成流量用量进度条
+const genBandwidthUsedRate = (input) => input ? Number((input.used / input.total * 100).toFixed(1)) : 100;
+// 生成数组长度
+const genArrayLength = (input) => input ? input.length : 0;
 
-// 刷新数据表内容
-const refreshData = () => getNewData();
+// 代理连接秘钥复制
+const linkKeyClick = (event) => {
+  navigator.clipboard.writeText(event.target.closest("div").firstElementChild.title);
+  toast.add({ severity: "success", summary: "复制", detail: "已复制", life: 1000 });
+}
 
-const genTagSerenity_1 = (input) => input == 'admin' ? 'danger' : 'success';
-const formatHy2Key = (input) => input.length >= 10 ? input.slice(0, 10) + "..." : input;
-const genMaxLinkSpeed = (input) => input / 1024 / 1024;
-const genDevicesCount = (input) => `${input.nowOnline} / ${input.maxOnline}`;
-const genBandwidthUsed = (input) => `${input.used}/${input.total}`;
-const genBandwidthUsedRate = (input) => Number((input.used / input.total * 100).toFixed(1));
+// 搜索函数
+const searchHandle = () => {
+  accountListData.value = accountConfStore.accountList.value.filter(account => account.userName.includes(searchText.value) || searchText.value.includes(account.userName));
+}
 
 // 获取新数据
 const getNewData = () => {
+  searchText.value = "";
   axios.get("/auth/allAccount")
-    .then(axiosRes => {
-      // const data = axiosRes.data;
-      accountListData.value = axiosRes.data;
-    })
-    .catch(axiosErr => {
-      toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
-    })
+    .then(axiosRes => accountConfStore.accountList.value = axiosRes.data)
+    .catch(axiosErr => toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 }))
+    .then(() => searchHandle());
 }
 
-onActivated(() => {
+// 添加账户
+const addNewAccount = () => {
+  accountConfStore.editorShow = true;
+}
+
+// 编辑数据
+const editHandle = (input) => {
+  console.log(input);
+}
+
+// 删除数据
+const deleteHandle = (input) => {
+  console.log(input);
+}
+
+onMounted(() => {
   getNewData();
 })
 
@@ -123,5 +160,10 @@ div.baseContainer {
   margin: -30px -10px 0 -10px;
   border-radius: 5px;
   overflow: hidden;
+}
+
+div.linkKeyDiv:hover {
+  cursor: pointer;
+  background-color: rgb(245, 245, 245);
 }
 </style>

@@ -116,10 +116,7 @@ const mainClick = () => {
   adminKeyInput.value = "";
 }
 
-const userInfoKeys = computed(() => {
-  console.log(Object.keys(authStore.getUserInfo()));
-  return Object.keys(authStore.getUserInfo());
-})
+const userInfoKeys = computed(() => Object.keys(authStore.getUserInfo()));
 
 onMounted(() => {
   axios("/auth/checkLogin", { method: "post" })
