@@ -6,9 +6,11 @@ export const useAccountConfStore = defineStore('accountConf', () => {
   const accountList = ref([]);
   const editorShow = ref(false);
   const editorMode = ref("add");
+  const targetIndex = ref(-1);
 
   // get函数
   const getAllAccounts = () => accountList.value;
+  const getEditMode = () => editorMode.value;
 
   // action函数
   const clearAllAccounts = () => accountList.value = [];
@@ -25,8 +27,8 @@ export const useAccountConfStore = defineStore('accountConf', () => {
   }
 
   return {
-    accountList, editorShow, editorMode,
-    getAllAccounts,
+    accountList, editorShow, editorMode, targetIndex,
+    getAllAccounts, getEditMode,
     clearAllAccounts, addNew, deleteOne, updateOne,
   };
 })

@@ -140,7 +140,7 @@ const registClick = () => {
   if (!adminKeyInputShow.value) return adminKeyInputShow.value = true;
 
 
-  axios("/auth/regist", {
+  axios("/auth/register", {
     method: "post", data: {
       userName: userNameInput.value,
       userPassword: md5Password(),

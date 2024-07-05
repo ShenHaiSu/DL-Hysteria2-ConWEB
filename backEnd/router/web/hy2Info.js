@@ -12,6 +12,37 @@ const rejectResponse = (req, res, next) => {
   res.send({ error: true, msg: "无权" });
 }
 
+// 认证服务器类
+class registeredServer {
+  alias = "";
+  domain = "";
+  port = [];
+  maxOnline = 0;
+  nowOnline = 0;
+  authCount = 0;
+  firstConnect;
+  lastConnect;
+  onlineList = {};
+  infoPort = "";
+  infoAuthKey = "";
+  error = {
+    method: 0,
+    body: 0,
+    reject: 0
+  }
+}
+
+// 未认证服务器类
+class unRegisteredServer {
+  firstConnect = 0;
+  lastConnect = 0;
+  connectCount = 0;
+  error = {
+    method: 0,
+    body: 0
+  }
+}
+
 // 权限检测
 router.use((req, res, next) => {
   // 检测cookie的Session
@@ -28,30 +59,30 @@ router.use((req, res, next) => {
 
 
 // 获取所有hy2服务器的数据
-router.get("/allInfo", (req, res, next) => {
+router.get("/all", (req, res, next) => {
   res.status(200);
   res.send(db_server);
 })
 
 // 获取所有已认证服务器的数据
-router.get("/authedInfo", (req, res, next) => {
+router.get("/allRegistered", (req, res, next) => {
   res.status(200);
   res.send(db_server[0]);
 })
 
 // 获取所有未认证服务器的数据
-router.get("/unauthedInfo", (req, res, next) => {
+router.get("/allUnregistered", (req, res, next) => {
   res.status(200);
   res.send(db_server[1]);
 })
 
 // 认证hy2服务器
-router.post("/authServer", (req, res, next) => {
+router.post("/registerServer", (req, res, next) => {
   res.status(200);
 })
 
 // 取消认证服务器
-router.post("/unauthServer", (req, res, next) => {
+router.post("/unRegisterServer", (req, res, next) => {
   res.status(200);
 })
 

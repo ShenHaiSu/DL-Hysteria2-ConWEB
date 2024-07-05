@@ -29,7 +29,7 @@ class Account {
 }
 
 // 注册接口
-router.post("/regist", (req, res, next) => {
+router.post("/register", (req, res, next) => {
   const isAdmin = req.body.adminKey == adminKey;
 
   if (db_account.some(account => account['userName'] == req.body['userName'])) {
@@ -45,7 +45,7 @@ router.post("/regist", (req, res, next) => {
     db_account.push(newData);
 
     res.status(200);
-    res.cookie("session", newData.session, { httpOnly: true });
+    if (!req.body['manual']) res.cookie("session", newData.session, { httpOnly: true });
     res.send({
       error: false,
       msg: "欢迎你，" + newData.userName,
@@ -160,5 +160,39 @@ router.get("/allAccount", (req, res, next) => {
   res.status(200);
   res.send(sendObj);
 })
+
+// 删除指定账号
+router.post("/delete", (req, res, next) => {
+  // 检查登录状态
+  if (!req.cookies['session'] || req.cookies['session'] == "") {
+    res.status(500);
+    res.send({ error: true, msg: "无权" });
+    return;
+  }
+  // 检查权限
+  const requestAccount = db_account.findIndex(account => account.session == req.cookies['session']);
+  if (requestAccount == -1 || db_account[requestAccount].userPermission != "admin") {
+    res.status(500);
+    res.send({ error: true, msg: "无权" });
+    return;
+  }
+  // 检查body
+  if (!req.body['userName'] || req.body['userName'] == "") {
+    res.status(500);
+    res.send({ error: true, msg: "参数不齐" });
+    return;
+  }
+  // 删除操作
+  const targetAccountIndex = db_account.findIndex(account => account.userName == req.body['userName']);
+  if (targetAccountIndex == -1) {
+    res.status(500);
+    res.send({ error: true, msg: "目标不存在" });
+    return;
+  }
+  db_account.splice(targetAccountIndex, 1);
+  res.status(200);
+  res.send({ error: false, msg: "完成删除，删除1项。" });
+})
+
 
 module.exports.router = router;

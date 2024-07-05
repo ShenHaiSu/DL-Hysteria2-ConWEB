@@ -4,20 +4,34 @@
       <DataTable :value="accountListData">
         <!-- 数据表头 -->
         <template #header>
-          <div style="display: flex; align-items: center; gap: 10px;">
-            <div style="flex: 8;display: flex;gap: 10px;">
-              <InputText v-model="searchText" placeholder="搜索用户名" @keydown.enter="searchHandle" />
-              <Button @click="searchHandle">
-                <IconSearch style="font-size: 20px;" />
-              </Button>
+          <div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="flex: 8;display: flex;gap: 10px;">
+                <InputGroup>
+                  <InputText size="small" v-model="searchText" placeholder="搜索用户名" @keydown.enter="searchHandle" />
+                  <Button size="small" @click="searchHandle">
+                    <IconSearch style="font-size: 20px;" />
+                  </Button>
+                </InputGroup>
+              </div>
+              <div style="flex: 30;"></div>
+              <Button size="small" severity="secondary" text :disabled="true">更多操作</Button>
+              <Button @click="addNewAccount" style="flex:2;" size="small">添加</Button>
+              <Button @click="getNewData" style="flex:4;" size="small"> 刷新 </Button>
             </div>
-            <div style="flex: 30;"></div>
-            <Button @click="addNewAccount" style="flex:2;" size="small">添加</Button>
-            <Button @click="getNewData" style="flex:4;" size="small"> 刷新 </Button>
+            <div>
+
+            </div>
           </div>
         </template>
         <!-- 数据表体 -->
-        <Column header="用户名" field="userName"></Column>
+        <Column header="用户名">
+          <template #body="slotProps">
+            <div DataTableNameCol>
+              <span>{{ slotProps.data.userName }}</span>
+            </div>
+          </template>
+        </Column>
         <Column header="权限">
           <template #body="slotProps">
             <Tag :value="slotProps.data.userPermission" :severity="genTagSerenity(slotProps.data.userPermission)" />
@@ -25,13 +39,14 @@
         </Column>
         <Column header="代理连接秘钥">
           <template #body="slotProps">
-            <Inplace>
+            <Inplace style="width: 140px; height: 43px;">
               <template #display> 点击显示 </template>
               <template #content>
-                <div @click="linkKeyClick" class="linkKeyDiv">
-                  <span :title="slotProps.data.userInfo.hy2Key">{{ formatHy2Key(slotProps.data.userInfo.hy2Key)
-                    }}</span>
-                  <IconCopy />
+                <div class="linkKeyDiv">
+                  <Button severity="secondary" size="small" @click="linkKeyClick(slotProps.data.userInfo.hy2Key)"> {{
+        formatHy2Key(slotProps.data.userInfo.hy2Key) }}
+                    <IconCopy />
+                  </Button>
                 </div>
               </template>
             </Inplace>
@@ -77,7 +92,7 @@
 
 <script setup>
 // 静态引入
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, nextTick } from 'vue';
 import { ref } from 'vue';
 import axios from "axios";
 import { useToast } from 'primevue/usetoast';
@@ -85,13 +100,15 @@ import { onMounted } from 'vue';
 import IconCopy from "@/components/icons/IconCopy.vue"
 import IconSearch from "@/components/icons/IconSearch.vue"
 import { useAccountConfStore } from "@/stores/accountConf.js";
+import { watch } from 'vue';
 
 // 动态引入
 const DataTable = defineAsyncComponent(() => import("primevue/datatable"));
 const Tag = defineAsyncComponent(() => import("primevue/tag"));
 const Inplace = defineAsyncComponent(() => import("primevue/inplace"));
-const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"))
+const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"));
 const Editor = defineAsyncComponent(() => import("@/components/accountConf/editor.vue"));
+const InputGroup = defineAsyncComponent(() => import("primevue/inputgroup"));
 
 // 初始化
 const accountListData = ref([]);
@@ -115,19 +132,24 @@ const genBandwidthUsedRate = (input) => input ? Number((input.used / input.total
 const genArrayLength = (input) => input ? input.length : 0;
 
 // 代理连接秘钥复制
-const linkKeyClick = (event) => {
-  navigator.clipboard.writeText(event.target.closest("div").firstElementChild.title);
+const linkKeyClick = (input) => {
+  // navigator.clipboard.writeText(event.target.closest("div").firstElementChild.title);
+  navigator.clipboard.writeText(input);
   toast.add({ severity: "success", summary: "复制", detail: "已复制", life: 1000 });
 }
 
 // 搜索函数
 const searchHandle = () => {
-  accountListData.value = accountConfStore.accountList.value.filter(account => account.userName.includes(searchText.value) || searchText.value.includes(account.userName));
+  accountListData.value = [];
+  setTimeout(() => {
+    accountListData.value = accountConfStore.accountList.value.filter(account => account.userName.includes(searchText.value) || searchText.value.includes(account.userName));
+  }, 1);
 }
 
 // 获取新数据
-const getNewData = () => {
-  searchText.value = "";
+const getNewData = (resetSearch = true) => {
+  if (resetSearch) searchText.value = "";
+  accountConfStore.accountList.value = [];
   axios.get("/auth/allAccount")
     .then(axiosRes => accountConfStore.accountList.value = axiosRes.data)
     .catch(axiosErr => toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 }))
@@ -136,18 +158,32 @@ const getNewData = () => {
 
 // 添加账户
 const addNewAccount = () => {
+  accountConfStore.editorMode = "add";
   accountConfStore.editorShow = true;
 }
 
 // 编辑数据
 const editHandle = (input) => {
-  console.log(input);
+  const targetIndex = accountConfStore.accountList.value.findIndex(account => account.userName == input.userName);
+  accountConfStore.targetIndex = targetIndex;
+  accountConfStore.editorMode = "edit";
+  accountConfStore.editorShow = true;
 }
 
 // 删除数据
 const deleteHandle = (input) => {
-  console.log(input);
+  const targetIndex = accountConfStore.accountList.value.findIndex(account => account.userName == input.userName);
+  accountConfStore.targetIndex = targetIndex;
+  accountConfStore.editorMode = "delete";
+  accountConfStore.editorShow = true;
 }
+
+// 监听数据
+watch(() => accountConfStore.editorMode, (newValue, oldValue) => {
+  if (newValue != "done") return;
+  getNewData(false);
+})
+
 
 onMounted(() => {
   getNewData();
@@ -162,8 +198,25 @@ div.baseContainer {
   overflow: hidden;
 }
 
+div.linkKeyDiv>* {
+  width: 100%;
+}
+
+div.linkKeyDiv {
+  width: 100%;
+}
+
 div.linkKeyDiv:hover {
   cursor: pointer;
-  background-color: rgb(245, 245, 245);
+}
+
+div[DataTableNameCol] {
+  width: 50px;
+  overflow: hidden;
+}
+
+div[DataTableNameCol]:hover {
+  width: max-content;
+  overflow: visible;
 }
 </style>

@@ -7,49 +7,59 @@ const db_server = tools.db_getObj("servers");
 const db_account = tools.db_getObj("accounts");
 if (db_server.length == 0) db_server.push({}, {});
 
+
+// 认证服务器类
+class registeredServer {
+  alias = "";
+  domain = "";
+  port = [];
+  maxOnline = 0;
+  nowOnline = 0;
+  authCount = 0;
+  firstConnect;
+  lastConnect;
+  onlineList = {};
+  infoPort = "";
+  infoAuthKey = "";
+  error = {
+    method: 0,
+    body: 0,
+    reject: 0
+  }
+}
+
+// 未认证服务器类
+class unRegisteredServer {
+  firstConnect = 0;
+  lastConnect = 0;
+  connectCount = 0;
+  error = {
+    method: 0,
+    body: 0
+  }
+}
+
 // 中间件 - 检查发来申请的ip是否在服务器列表中
 router.use((req, res, next) => {
   let methodError = false;
   let bodyError = false;
 
-  // IP是否是已认证的服务器
-  if (db_server[0][req.ip]) {
-    // 诊断body和method是否合法
-    if (req.method != "POST") methodError = true;
-    if (!(req.body['addr'] && req.body['auth'] && req.body['tx'])) bodyError = true;
-
-    // 更新数据
-    db_server[0][req.ip] = {
-      connectTimes: (db_server[0][req.ip].connectTimes || 0) + 1,
-      methodErrorTimes: (db_server[0][req.ip].methodErrorTimes || 0) + (methodError ? 1 : 0),
-      bodyErrorTimes: (db_server[0][req.ip].bodyErrorTimes || 0) + (bodyError ? 1 : 0),
-    }
-
-    // 处理结果
-    if (methodError || bodyError) {
-      res.status(404);
-      res.send();
-      return;
-    } else {
-      return next();
-    }
-  }
-
-  // IP是否被加入到待认证服务器中
-  if (!db_server[1](req.ip)) db_server[1][req.ip] = { firstConnectTimeStamp: new Date().getTime() };
   if (req.method != "POST") methodError = true;
   if (!(req.body['addr'] && req.body['auth'] && req.body['tx'])) bodyError = true;
 
-  // 更新数据
-  db_server[1][req.ip] = {
-    connectTimes: (db_server[1][req.ip].connectTimes || 0) + 1,
-    methodErrorTimes: (db_server[1][req.ip].methodErrorTimes || 0) + (methodError ? 1 : 0),
-    bodyErrorTimes: (db_server[1][req.ip].bodyErrorTimes || 0) + (bodyError ? 1 : 0),
+  if (db_server[0][req.ip]) {
+    next();
+  } else {
+    if (!db_server[1][req.ip]) db_server[1][req.ip] = new unRegisteredServer();
+    if (!db_server[1][req.ip].firstConnect) db_server[1][req.ip].firstConnect = new Date().getTime();
+    db_server[1][req.ip].lastConnect = new Date().getTime();
+    db_server[1][req.ip].connectCount += 1;
+    db_server[1][req.ip].error.method += methodError ? 1 : 0;
+    db_server[1][req.ip].error.body += bodyError ? 1 : 0;
+    res.status(404);
+    res.send({});
+    return;
   }
-
-  res.status(404);
-  res.send();
-  return;
 })
 
 // 面向外部hy2的认证接口
@@ -62,9 +72,28 @@ router.post("/auth", (req, res, next) => {
     return;
   }
 
+  const targetAccount = db_account[targetAccountIndex];
+  // 检查认证
+  const serverAccess = targetAccount.accessServer.some(alias => db_server[0][req.ip].alias == alias);
+  const serverBlock = !targetAccount.blockServer.some(alias => db_server[0][req.ip].alias == alias);
+  const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
+  const onlineCount = (targetAccount.nowOnline + 1) <= targetAccount.maxOnline;
+  const txSpeedAccess = req.body['tx'] <= targetAccount.txSpeed;
+
+  // 任意一个认证不通过就直接拒绝
+  if (!(serverAccess && serverBlock && onlineCount && txSpeedAccess && serverOnlineCount)) {
+    res.status(404);
+    res.send({});
+    return;
+  }
+
+  // 变更记录数据
+  db_server[0][req.ip].nowOnline += 1;
+  targetAccount.nowOnline += 1;
+
   // 返回认证数据
   res.status(200);
-  res.send({ ok: true, id: db_account[targetAccountIndex]['userName'] });
+  res.send({ ok: true, id: targetAccount.userName });
 })
 
 module.exports.router = router;
