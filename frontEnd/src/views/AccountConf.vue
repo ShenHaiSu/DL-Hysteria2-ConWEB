@@ -15,9 +15,9 @@
                 </InputGroup>
               </div>
               <div style="flex: 30;"></div>
-              <Button size="small" severity="secondary" text :disabled="true">更多操作</Button>
+              <Button size="small" severity="secondary" text :disabled="true" style="flex:2;">更多操作</Button>
               <Button @click="addNewAccount" style="flex:2;" size="small">添加</Button>
-              <Button @click="getNewData" style="flex:4;" size="small"> 刷新 </Button>
+              <Button @click="getNewData" style="flex:2;" size="small"> 刷新 </Button>
             </div>
             <div>
 
@@ -27,7 +27,7 @@
         <!-- 数据表体 -->
         <Column header="用户名">
           <template #body="slotProps">
-            <div DataTableNameCol>
+            <div DataTableNameCol v-tooltip.top="slotProps.data.userName">
               <span>{{ slotProps.data.userName }}</span>
             </div>
           </template>
@@ -121,7 +121,7 @@ const genTagSerenity = (input) => input == 'admin' ? 'danger' : 'success';
 // 生成代理连接秘钥的显示文本
 const formatHy2Key = (input) => input ? input.length >= 10 ? input.slice(0, 10) + "..." : input : "Null";
 // 生成最大链接速率
-const genMaxLinkSpeed = (input) => input ? input / 1024 / 1024 : 0;
+const genMaxLinkSpeed = (input) => input ? (input / 1048576).toFixed(2) : 0;
 // 生成连接设备限制数
 const genDevicesCount = (input) => (input.nowOnline != undefined) ? `${input.nowOnline} / ${input.maxOnline}` : "缺失";
 // 生成流量用量文本
@@ -213,10 +213,5 @@ div.linkKeyDiv:hover {
 div[DataTableNameCol] {
   width: 50px;
   overflow: hidden;
-}
-
-div[DataTableNameCol]:hover {
-  width: max-content;
-  overflow: visible;
 }
 </style>

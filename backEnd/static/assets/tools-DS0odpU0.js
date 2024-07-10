@@ -1,0 +1,1 @@
+const c=(e,r)=>{t(e),Object.keys(r).forEach(s=>e[s]=r[s])},t=e=>{Object.keys(e).forEach(r=>delete e[r])},o=(e,r="0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM")=>{let s="";for(let a=0;a<e;a++)s+=r[Math.floor(Math.random()*r.length)];return s};export{c as a,t as c,o as r};

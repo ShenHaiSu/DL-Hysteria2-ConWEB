@@ -25,24 +25,17 @@
       </div>
     </div>
 
+
     <!-- 编辑账号信息框 -->
     <div v-if="accountConfStore.editorMode == 'edit'">
-      <div>
-        <div>
-          
-        </div>
-
-      </div>
-      <Divider />
-      <div style="display: flex; justify-content: center; margin-top: 20px;">
-        <Button @click="cancelDelete" severity="secondary">取消</Button>
-        <Divider layout="vertical" />
-        <Button @click="confirmDelete" severity="success">确定</Button>
-      </div>
+      <EditorMain :targetIndex="accountConfStore.targetIndex" />
     </div>
+
+
     <!-- 删除账号信息确认 -->
     <div v-if="accountConfStore.editorMode == 'delete'">
       <div>
+        <p>操作目标：{{ accountConfStore.accountList.value[accountConfStore.targetIndex].userName }}</p>
         <p>删除后该账号的使用者无法在通过此hy2Key进行连接代理。</p>
       </div>
 
@@ -56,6 +49,7 @@
 </template>
 
 <script setup>
+// 静态引入
 import md5 from "md5";
 import axios from 'axios';
 import { ref, computed, defineAsyncComponent } from 'vue';
@@ -63,15 +57,14 @@ import { useToast } from 'primevue/usetoast';
 import { useAccountConfStore } from '@/stores/accountConf';
 import { watch } from "vue";
 
-// 静态引入
-const accountConfStore = useAccountConfStore();
-
 // 动态引入
 const Dialog = defineAsyncComponent(() => import("primevue/dialog"));
 const FloatLabel = defineAsyncComponent(() => import("primevue/floatlabel"));
+const EditorMain = defineAsyncComponent(() => import("@/components/accountConf/accountEdit.vue"));
 
 // 初始化
-const dialogStyle = ref({ maxWidth: '50vw', minWidth: `350px` });
+const accountConfStore = useAccountConfStore();
+const dialogStyle = ref({ maxWidth: '50vw', minWidth: `500px` });
 const toast = useToast();
 const newAccountInfo = ref({ userName: "", userPassword: "", adminKey: "" });
 const targetAccount = ref({});
@@ -144,7 +137,6 @@ const confirmCreate = () => {
       toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 2000 });
     })
 }
-
 </script>
 
 <style scoped>

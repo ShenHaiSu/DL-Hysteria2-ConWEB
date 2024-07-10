@@ -25,6 +25,10 @@ class Account {
     nowOnline: 0, // 当前设备在线数，这个交给自动更新维护
     accessServer: [], // 有权使用的服务器
     blockServer: [], // 无权使用的服务器
+    bandwidth: {
+      total: 0,
+      used: 0
+    }
   };
 }
 
@@ -192,6 +196,11 @@ router.post("/delete", (req, res, next) => {
   db_account.splice(targetAccountIndex, 1);
   res.status(200);
   res.send({ error: false, msg: "完成删除，删除1项。" });
+})
+
+// 编辑账号信息
+router.post("/edit", (req, res, next) => {
+
 })
 
 

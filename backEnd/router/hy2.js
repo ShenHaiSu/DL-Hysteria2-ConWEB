@@ -24,7 +24,8 @@ class registeredServer {
   error = {
     method: 0,
     body: 0,
-    reject: 0
+    reject: 0,
+    timeout: 0,
   }
 }
 
@@ -52,6 +53,7 @@ router.use((req, res, next) => {
   } else {
     if (!db_server[1][req.ip]) db_server[1][req.ip] = new unRegisteredServer();
     if (!db_server[1][req.ip].firstConnect) db_server[1][req.ip].firstConnect = new Date().getTime();
+    
     db_server[1][req.ip].lastConnect = new Date().getTime();
     db_server[1][req.ip].connectCount += 1;
     db_server[1][req.ip].error.method += methodError ? 1 : 0;

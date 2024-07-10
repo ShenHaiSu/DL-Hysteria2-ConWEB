@@ -12,9 +12,13 @@ import Lara from '@primevue/themes/lara';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import ToastService from 'primevue/toastservice';
+import Tooltip from 'primevue/tooltip';
 
 // 引入axios设置初始化
 import axios from "axios";
+
+// 引入css
+import("./assets/public.css");
 
 axios.defaults.baseURL = "/api";
 
@@ -43,5 +47,6 @@ app.use(router);
 // 注册组件
 app.component('InputText', InputText);
 app.component('Button', Button);
+app.directive('tooltip', Tooltip);
 
 app.mount('#app');
