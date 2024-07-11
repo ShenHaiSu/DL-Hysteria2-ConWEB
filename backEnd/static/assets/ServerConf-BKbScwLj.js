@@ -1,2 +1,0 @@
-const __vite__fileDeps=["assets/navBar-BXucQEph.js","assets/index-D39o__6r.js","assets/index-DBz_WDjk.css","assets/hy2Server-BNuU1OBG.js","assets/navBar-2wOucInf.css"],__vite__mapDeps=i=>i.map(i=>__vite__fileDeps[i]);
-import{a as o,k as t,b as e,d as a,e as _,g as s,_ as r}from"./index-D39o__6r.js";const l=e("div",null,null,-1),c=e("div",null,null,-1),v={__name:"ServerConf",setup(d){const n=s(()=>r(()=>import("./navBar-BXucQEph.js"),__vite__mapDeps([0,1,2,3,4])));return(i,u)=>(o(),t("div",null,[e("div",null,[a(_(n))]),l,c]))}};export{v as default};
