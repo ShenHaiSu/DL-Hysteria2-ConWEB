@@ -77,7 +77,7 @@
         <Column header="操作">
           <template #body="slotProps">
             <div style="display: flex; gap: 10px;">
-              <Button @click="editHandle(slotProps.data)" security="success" size="small">编辑</Button>
+              <Button @click="editHandle(slotProps.data)"  security="success" size="small">编辑</Button>
               <Button @click="deleteHandle(slotProps.data)" severity="danger" size="small">删除</Button>
             </div>
           </template>
@@ -121,7 +121,7 @@ const genTagSerenity = (input) => input == 'admin' ? 'danger' : 'success';
 // 生成代理连接秘钥的显示文本
 const formatHy2Key = (input) => input ? input.length >= 10 ? input.slice(0, 10) + "..." : input : "Null";
 // 生成最大链接速率
-const genMaxLinkSpeed = (input) => input ? (input / 1048576).toFixed(2) : 0;
+const genMaxLinkSpeed = (input) => input ? (input / 125000).toFixed(2) : 0;
 // 生成连接设备限制数
 const genDevicesCount = (input) => (input.nowOnline != undefined) ? `${input.nowOnline} / ${input.maxOnline}` : "缺失";
 // 生成流量用量文本
@@ -133,7 +133,6 @@ const genArrayLength = (input) => input ? input.length : 0;
 
 // 代理连接秘钥复制
 const linkKeyClick = (input) => {
-  // navigator.clipboard.writeText(event.target.closest("div").firstElementChild.title);
   navigator.clipboard.writeText(input);
   toast.add({ severity: "success", summary: "复制", detail: "已复制", life: 1000 });
 }
@@ -164,6 +163,7 @@ const addNewAccount = () => {
 
 // 编辑数据
 const editHandle = (input) => {
+  if (accountConfStore.editorShow) return;
   const targetIndex = accountConfStore.accountList.value.findIndex(account => account.userName == input.userName);
   accountConfStore.targetIndex = targetIndex;
   accountConfStore.editorMode = "edit";

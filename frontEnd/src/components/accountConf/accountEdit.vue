@@ -23,13 +23,13 @@
         <div>
           <FloatLabel>
             <label>最大速率 ≈{{ genTxSpeedMb(targetAccount.userInfo.txSpeed) }}Mb/s</label>
-            <InputText size="small" placeholder="最大速率" v-model="targetAccount.userInfo.txSpeed" />
+            <InputText size="small" type="number" placeholder="最大速率" v-model="targetAccount.userInfo.txSpeed" />
           </FloatLabel>
         </div>
         <div>
           <FloatLabel>
             <label>最大在线数</label>
-            <InputText size="small" placeholder="最大在线数" v-model="targetAccount.userInfo.maxOnline" />
+            <InputText size="small" type="number" placeholder="最大在线数" v-model="targetAccount.userInfo.maxOnline" />
           </FloatLabel>
         </div>
         <div>
@@ -45,32 +45,34 @@
           <Button @click="clearBandwidthUsed" size="small" severity="secondary">清空已用量</Button>
           <Button @click="reGenHy2Key" size="small" severity="secondary">重置代理连接密码</Button>
         </div>
-        <!-- {{ targetAccount }} -->
       </div>
       <div PermissionEditDiv>
         <div>
           <InputGroup style="font-size: 80%;">
-            <InputText />
-            <Button>
+            <InputText v-model="searchText" @keydown.enter="searchConfirm" />
+            <Button @click="searchConfirm">
               <IconSearch style="font-size: 350%;" />
             </Button>
           </InputGroup>
         </div>
-        <div style="margin-top: 20px; overflow-x: auto; width: max-content; max-height: 50vh;">
-          <div ServerPermissionEdit v-for="server in hy2ServerStore.registeredList">
+        <div ServerPermissionEditContainer>
+          <div ServerPermissionEdit :class="genServerLineClass(server)" v-for="server in serverPermissionTempList">
             <div style="flex: 1;">
               <span>{{ server.alias }}</span>
             </div>
-            <div class="space"></div>
+            <div class="space" style="min-width: 10px;"></div>
             <div ServerPermissionContentDiv style="flex: 1;">
               <InputGroup style="height: 100%; width: 100%;">
-                <Button size="small"  severity="secondary">
+                <Button size="small" @click="changeServerPermission(1, server)" :class="getClassName('access', server)"
+                  severity="secondary">
                   <IconSuccess />
                 </Button>
-                <Button size="small"  severity="secondary">
+                <Button size="small" @click="changeServerPermission(0, server)" :class="getClassName('default', server)"
+                  severity="secondary">
                   <IconDefault />
                 </Button>
-                <Button size="small"  severity="secondary">
+                <Button size="small" @click="changeServerPermission(-1, server)" :class="getClassName('block', server)"
+                  severity="secondary">
                   <IconSlash />
                 </Button>
               </InputGroup>
@@ -90,9 +92,10 @@
 <script setup>
 // 静态引入
 import axios from 'axios';
-import { ref, defineProps } from 'vue';
+import { ref } from 'vue';
 import { useAccountConfStore } from '@/stores/accountConf';
 import { useHy2ServserStore } from "@/stores/hy2Server.js";
+import { useAuthStore } from '@/stores/auth';
 import { defineAsyncComponent } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import { randomString } from "@/assets/tools.js";
@@ -101,7 +104,6 @@ import { randomString } from "@/assets/tools.js";
 const FloatLabel = defineAsyncComponent(() => import("primevue/floatlabel"));
 const Divider = defineAsyncComponent(() => import("primevue/divider"));
 const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"));
-// const RadioButton = defineAsyncComponent(() => import("primevue/radiobutton"));
 
 // Icon引入
 const IconSearch = defineAsyncComponent(() => import("@/components/icons/IconSearch.vue"));
@@ -114,18 +116,23 @@ const toast = useToast();
 const Props = defineProps(['targetIndex']);
 const accountConfStore = useAccountConfStore();
 const hy2ServerStore = useHy2ServserStore();
+const authStore = useAuthStore();
 const targetAccount = ref({});
+const serverPermissionTempList = ref([]);
+const searchText = ref("");
 
+// 赋予账户权限信息
 targetAccount.value = JSON.parse(JSON.stringify(accountConfStore.accountList.value[Props.targetIndex]));
+// 赋予服务器权限信息
+serverPermissionTempList.value = hy2ServerStore.registeredList.map(server => {
+  if (targetAccount.value.userInfo.accessServer.some(access => access == server.alias)) return { ...server, permission: 1, show: true };
+  if (targetAccount.value.userInfo.blockServer.some(block => block == server.alias)) return { ...server, permission: -1, show: true };
+  return { ...server, permission: 0, show: true };
+});
+searchText.value = "";
 
-const genTxSpeedMb = (txSpeed) => txSpeed ? (txSpeed / 1048576).toFixed(2) : 0;
+const genTxSpeedMb = (txSpeed) => txSpeed ? (txSpeed / 125000).toFixed(2) : 0;
 const genBandwidthUsedRate = (input) => input ? Number((input.used / input.total * 100).toFixed(1)) : 100;
-
-// 取消编辑
-const cancelEdit = () => accountConfStore.editorShow = false;
-
-// 确定编辑提交结果
-const confirmEdit = () => console.log(targetAccount.value);
 
 // 清空已用量
 const clearBandwidthUsed = () => targetAccount.value.userInfo.bandwidth.used = 0;
@@ -133,13 +140,81 @@ const clearBandwidthUsed = () => targetAccount.value.userInfo.bandwidth.used = 0
 // 重新生成代理连接密码
 const reGenHy2Key = () => targetAccount.value.userInfo.hy2Key = randomString(30);
 
+// 确认搜索
+const searchConfirm = () => {
+  for (let i = 0; i < serverPermissionTempList.value.length; i++) {
+    const server = serverPermissionTempList.value[i];
+    server.show = false;
+    if (server.alias.includes(searchText.value) || searchText.value.includes(server.alias)) server.show = true;
+  }
+}
+
+// 服务器行class生成
+const genServerLineClass = (server) => server.show ? "serverLineShow" : "serverLineHide";
+
+// 给按钮生成class
+const getClassName = (type, server) => {
+  let result = `defaultClass`
+
+  if (type == "access" && server.permission == 1) {
+    result += " target access";
+  } else if (type == "default" && server.permission == 0) {
+    result += " target default";
+  } else if (type == "block" && server.permission == -1) {
+    result += " target block";
+  }
+
+  return result;
+}
+
+// 服务器权限按钮被点击
+const changeServerPermission = (type, server) => server.permission = type;
+
+// 取消编辑
+const cancelEdit = () => accountConfStore.editorShow = false;
+
+// 确定编辑提交结果
+const confirmEdit = () => {
+  // 生成提交post的data
+  const postData = {
+    target: targetAccount.value.userName,
+    hy2Key: targetAccount.value.userInfo.hy2Key,
+    txSpeed: parseInt(targetAccount.value.userInfo.txSpeed),
+    maxOnline: parseInt(targetAccount.value.userInfo.maxOnline),
+    maxBandwidth: parseFloat(targetAccount.value.userInfo.bandwidth.total),
+    usedBandwidth: targetAccount.value.userInfo.bandwidth.used,
+    accessServer: serverPermissionTempList.value.filter(server => server.permission == 1).map(server => server.alias),
+    blockServer: serverPermissionTempList.value.filter(server => server.permission == -1).map(server => server.alias),
+  }
+
+  axios.post("/auth/edit", postData)
+    .then(axiosRes => {
+      if (axiosRes.data.error) throw new Error("服务器拒绝");
+      accountConfStore.accountList.value[Props.targetIndex] = axiosRes.data.targetAccount;
+      toast.add({ severity: "success", summary: "完成", detail: axiosRes.data.msg, life: 3000 });
+
+      // 取消显示
+      accountConfStore.editorShow = false;
+      accountConfStore.targetIndex = -1;
+      accountConfStore.editorMode = "done";
+      
+      // 检查修改目标是否是当前登录的账号，并提交更改
+      const backData = axiosRes.data.targetAccount;
+      if (authStore.userName != backData.userName) return;
+      authStore.coverUserInfo(backData.userInfo);
+    })
+    .catch(axiosErr => {
+      toast.add({ severity: "error", summary: "失败", detail: "服务器拒绝" + axiosErr?.response?.data?.msg, life: 5000 });
+    })
+}
+
+
 </script>
 
 <style scoped>
 div[AccountEditMainBase] {
   display: flex;
   margin-top: 20px;
-  font-size: 80% !important;
 }
 
 div[AccountMainEditDiv] {
@@ -173,8 +248,14 @@ div[PermissionEditDiv] {
 div[ServerPermissionEdit] {
   display: flex;
   margin-top: 5px;
+  gap: 10px;
   transition: all ease-in-out 0.07s;
   border-radius: 5px;
+  padding: 0 10px;
+}
+
+div[ServerPermissionEdit].serverLineHide {
+  display: none;
 }
 
 div[ServerPermissionEdit]:hover {
@@ -189,8 +270,33 @@ div[ServerPermissionEdit]>.space {
   flex: 3;
 }
 
-div[ServerPermissionContentDiv] .p-button {
+.defaultClass {
   color: rgb(70, 70, 70);
   background-color: rgb(255, 255, 255);
+}
+
+.defaultClass.target {
+  color: rgb(255, 255, 255);
+}
+
+.defaultClass.target.access {
+  background-color: rgb(16, 185, 129);
+}
+
+.defaultClass.target.default {
+  background-color: rgb(179, 179, 179);
+}
+
+.defaultClass.target.block {
+  background-color: rgb(222, 34, 34);
+}
+
+
+div[ServerPermissionEditContainer] {
+  margin-top: 20px;
+  overflow-x: hidden;
+  width: 100%;
+  max-height: 50vh;
+  overflow-y: scroll;
 }
 </style>

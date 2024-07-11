@@ -1,0 +1,1 @@
+import{C as i,H as e}from"./index-D39o__6r.js";const c=i("hy2Server",()=>{const t=e([]),s=e([]),r=e("");return{registeredList:t,unRegisteredList:s,searchText:r,getRegisteredList:()=>t.value,getUnRegisteredList:()=>s.value}});export{c as u};

@@ -20,17 +20,23 @@ class Account {
   session = "";
   userInfo = {
     hy2Key: tools.genRandomString(30),
-    txSpeed: 5242880, // 默认 5mb/s
+    txSpeed: 125000, // 默认 1mb/s  125000 = 1Mbps
     maxOnline: 3, // 默认最多三设备在线
     nowOnline: 0, // 当前设备在线数，这个交给自动更新维护
     accessServer: [], // 有权使用的服务器
     blockServer: [], // 无权使用的服务器
     bandwidth: {
-      total: 0,
+      total: 5, // 默认带宽 5GB
       used: 0
     }
   };
 }
+
+const rejectResponse = (req, res, next) => {
+  res.status(500);
+  res.send({ error: true, msg: "no access" });
+}
+
 
 // 注册接口
 router.post("/register", (req, res, next) => {
@@ -193,6 +199,11 @@ router.post("/delete", (req, res, next) => {
     res.send({ error: true, msg: "目标不存在" });
     return;
   }
+  /**
+   * 
+   * todo: 下发通知给所有服务器kick掉这个用户
+   * 
+   */
   db_account.splice(targetAccountIndex, 1);
   res.status(200);
   res.send({ error: false, msg: "完成删除，删除1项。" });
@@ -200,7 +211,27 @@ router.post("/delete", (req, res, next) => {
 
 // 编辑账号信息
 router.post("/edit", (req, res, next) => {
+  // 检查body格式
+  const checkList = ['target', 'hy2Key', 'txSpeed', 'maxOnline', 'maxBandwidth', 'usedBandwidth', 'accessServer', 'blockServer'];
+  if (!req.body || !checkList.some(key => req.body[key])) return rejectResponse(req, res, next);
 
+  // 检查目标是否存在
+  const targetIndex = db_account.findIndex(account => account.userName == req.body['target']);
+  if (targetIndex == -1) return rejectResponse(req, res, next);
+
+  // 提交更新
+  const targetAccount = db_account[targetIndex];
+  targetAccount.userInfo.hy2Key = req.body['hy2Key'];
+  targetAccount.userInfo.txSpeed = req.body['txSpeed'];
+  targetAccount.userInfo.maxOnline = req.body['maxOnline'];
+  targetAccount.userInfo.bandwidth.total = req.body['maxBandwidth'];
+  targetAccount.userInfo.bandwidth.used = req.body['usedBandwidth'];
+  targetAccount.userInfo.accessServer = req.body['accessServer'];
+  targetAccount.userInfo.blockServer = req.body['blockServer'];
+
+  // 返回成功
+  res.status(200);
+  res.send({ error: false, msg: "完成修改", targetAccount });
 })
 
 
