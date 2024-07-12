@@ -24,13 +24,24 @@ const router = createRouter({
       component: () => import("@/views/ServerConf.vue"),
       meta: {
         describe: "登记、删除、修改服务器信息"
-      }
-    },{
-      path:"/accountConf",
-      name:"账户控制面",
-      component:() => import("@/views/AccountConf.vue"),
-      meta:{
-        describe:"增添、修改、删除面板的账户相关信息"
+      },
+      children: [{
+        path: "registerServer",
+        name: "已认证服务器",
+        component: () => import("@/components/serverConf/registerServerPage.vue"),
+        meta: { describe: "编辑、修改、删除、查看已认证服务器的信息" }
+      }, {
+        path: "unRegisterServer",
+        name: "未认证服务器",
+        component: () => import("@/components/serverConf/unRegisterServerPage.vue"),
+        meta: { describe: "删除、查看未认证服务器的信息" }
+      }]
+    }, {
+      path: "/accountConf",
+      name: "账户控制面",
+      component: () => import("@/views/AccountConf.vue"),
+      meta: {
+        describe: "增添、修改、删除面板的账户相关信息"
       }
     }
   ]

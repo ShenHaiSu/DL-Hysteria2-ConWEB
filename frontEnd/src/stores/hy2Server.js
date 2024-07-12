@@ -8,17 +8,14 @@ export const useHy2ServserStore = defineStore('hy2Server', () => {
   const searchText = ref("");
   const editDialogShow = ref(false);
   const editDialogMode = ref("none");
+  const freshTarget = ref(0);
 
   // get函数
   const getRegisteredList = () => registeredList.value;
   const getUnRegisteredList = () => unRegisteredList.value;
 
-  // set函数
-
-
-
   return {
-    registeredList, unRegisteredList, searchText, editDialogShow, editDialogMode,
+    registeredList, unRegisteredList, searchText, editDialogShow, editDialogMode,freshTarget,
     getRegisteredList, getUnRegisteredList,
   }
 })

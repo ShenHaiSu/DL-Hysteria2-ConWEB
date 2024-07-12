@@ -58,7 +58,8 @@
         <div ServerPermissionEditContainer>
           <div ServerPermissionEdit :class="genServerLineClass(server)" v-for="server in serverPermissionTempList">
             <div style="flex: 1;">
-              <span>{{ server.alias }}</span>
+              <!-- <span>{{ server.alias }}</span> -->
+              {{ server.alias }}
             </div>
             <div class="space" style="min-width: 10px;"></div>
             <div ServerPermissionContentDiv style="flex: 1;">
@@ -251,7 +252,7 @@ div[ServerPermissionEdit] {
   gap: 10px;
   transition: all ease-in-out 0.07s;
   border-radius: 5px;
-  padding: 0 10px;
+  padding: 5px 5px;
 }
 
 div[ServerPermissionEdit].serverLineHide {
@@ -268,6 +269,11 @@ div[ServerPermissionEdit]>* {
 
 div[ServerPermissionEdit]>.space {
   flex: 3;
+}
+
+div[ServerPermissionEdit]>*:nth-child(1){
+  text-wrap: nowrap;
+  line-height: 100%;
 }
 
 .defaultClass {
@@ -297,6 +303,6 @@ div[ServerPermissionEditContainer] {
   overflow-x: hidden;
   width: 100%;
   max-height: 50vh;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 </style>
