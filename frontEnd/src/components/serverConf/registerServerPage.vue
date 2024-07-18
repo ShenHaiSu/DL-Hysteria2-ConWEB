@@ -1,3 +1,5 @@
+<!-- 所有已认证服务器的显示页面 内存放多个已认证服务器 -->
+
 <template>
   <div>
     <RegisterServer v-for="(server, index) in hy2ServerStore.registeredList" :target-index="index"

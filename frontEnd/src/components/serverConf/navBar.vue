@@ -46,26 +46,6 @@ const addNew = () => {
 
 // 刷新服务器信息
 const freshServerData = () => {
-  // axios.get("/hy2ServerInfo/all")
-  //   .then(axiosRes => {
-  //     hy2ServerStore.registeredList = [];
-  //     hy2ServerStore.unRegisteredList = [];
-
-  //     const data = axiosRes.data;
-  //     for (const key in data[0]) {
-  //       if (!Object.hasOwnProperty.call(data[0], key)) continue;
-  //       data[0][key]['address'] = key;
-  //       hy2ServerStore.registeredList = [...hy2ServerStore.registeredList, data[0][key]];
-  //     }
-  //     for (const key in data[1]) {
-  //       if (!Object.hasOwnProperty.call(data[0], key)) continue;
-  //       data[1][key]['address'] = key;
-  //       hy2ServerStore.unRegisteredList = [...hy2ServerStore.unRegisteredList, data[0][key]];
-  //     }
-  //   })
-  //   .catch(axiosErr => {
-  //     toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });
-  //   })
   hy2ServerStore.freshTarget = hy2ServerStore.freshTarget + 1;
 }
 

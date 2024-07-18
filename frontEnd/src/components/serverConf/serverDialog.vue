@@ -1,3 +1,5 @@
+<!-- Dialog主体 服务器信息编辑、新增、删除确认使用的信息显示基础 -->
+
 <template>
   <Dialog v-model:visible="hy2ServerStore.editDialogShow" modal :header="genDialogHeader()">
     <AddBlankServer v-if="hy2ServerStore.editDialogMode == 'add'" />

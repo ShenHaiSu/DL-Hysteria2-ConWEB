@@ -13,36 +13,10 @@ const rejectResponse = (req, res, next) => {
 }
 
 // 认证服务器类
-class registeredServer {
-  alias = "";
-  domain = "";
-  port = [];
-  maxOnline = 0;
-  nowOnline = 0;
-  authCount = 0;
-  firstConnect;
-  lastConnect;
-  onlineList = {};
-  infoPort = "";
-  infoAuthKey = "";
-  error = {
-    method: 0,
-    body: 0,
-    reject: 0,
-    timeout: 0,
-  }
-}
+const { RegisteredServer } = require("../../class/RegisteredServer.js");
 
 // 未认证服务器类
-class unRegisteredServer {
-  firstConnect = 0;
-  lastConnect = 0;
-  connectCount = 0;
-  error = {
-    method: 0,
-    body: 0
-  }
-}
+const { unRegisteredServer } = require("../../class/unRegisteredServer.js");
 
 // 权限检测
 router.use((req, res, next) => {
@@ -80,17 +54,18 @@ router.get("/allUnregistered", (req, res, next) => {
 // 认证hy2服务器
 router.post("/registerServer", (req, res, next) => {
   // 检查body内容
-  const bodyPropList = ["target", "alias", "port", "maxOnline", "infoPort", "infoAuthkey"];
+  const bodyPropList = ["target", "alias", "port", "maxOnline", "infoPort", "infoAuthkey", "maxBandwidth"];
   if (bodyPropList.some(prop => !Object.hasOwnProperty.call(req.body, prop))) return rejectResponse(req, res, next);
 
   // 创建新的认证服务器对象
-  const newServer = new registeredServer();
+  const newServer = new RegisteredServer();
   newServer.alias = req.body['alias'];
   newServer.domain = req.body['domain'] || "";
   newServer.port = req.body['port'];
   newServer.maxOnline = req.body['maxOnline'];
   newServer.infoPort = req.body['infoPort'];
   newServer.infoAuthKey = req.body['infoAuthkey'];
+  newServer.bandwidth.total = req.body['maxBandwidth'];
   db_server[0][req.body['target']] = newServer;
 
   // 删除未认证服务器对象
@@ -164,7 +139,8 @@ router.post("/clearServer", (req, res, next) => {
         authCount: 0,
         lastConnect: 0,
         onlineList: {},
-        error: { method: 0, body: 0, reject: 0, timeout: 0 }
+        error: { method: 0, body: 0, reject: 0, timeout: 0 },
+        bandwidth: { used: 0 }
       })
   } else if (db_server[1][targetServerIP]) {
     db_server[1][targetServerIP] = Object.assign(

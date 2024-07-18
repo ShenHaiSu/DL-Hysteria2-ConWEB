@@ -9,36 +9,10 @@ if (db_server.length == 0) db_server.push({}, {});
 
 
 // 认证服务器类
-class registeredServer {
-  alias = "";
-  domain = "";
-  port = [];
-  maxOnline = 0;
-  nowOnline = 0;
-  authCount = 0;
-  firstConnect;
-  lastConnect;
-  onlineList = {};
-  infoPort = "";
-  infoAuthKey = "";
-  error = {
-    method: 0,
-    body: 0,
-    reject: 0,
-    timeout: 0,
-  }
-}
+const { RegisteredServer } = require("../class/RegisteredServer.js");
 
 // 未认证服务器类
-class unRegisteredServer {
-  firstConnect = 0;
-  lastConnect = 0;
-  connectCount = 0;
-  error = {
-    method: 0,
-    body: 0
-  }
-}
+const { unRegisteredServer } = require("../class/unRegisteredServer.js");
 
 // 中间件 - 检查发来申请的ip是否在服务器列表中
 router.use((req, res, next) => {
@@ -53,7 +27,7 @@ router.use((req, res, next) => {
   } else {
     if (!db_server[1][req.ip]) db_server[1][req.ip] = new unRegisteredServer();
     if (!db_server[1][req.ip].firstConnect) db_server[1][req.ip].firstConnect = new Date().getTime();
-    
+
     db_server[1][req.ip].lastConnect = new Date().getTime();
     db_server[1][req.ip].connectCount += 1;
     db_server[1][req.ip].error.method += methodError ? 1 : 0;
@@ -81,9 +55,10 @@ router.post("/auth", (req, res, next) => {
   const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
   const onlineCount = (targetAccount.nowOnline + 1) <= targetAccount.maxOnline;
   const txSpeedAccess = req.body['tx'] <= targetAccount.txSpeed;
+  const serverBandwidthAccess = db_server[0][req.ip].bandwidth.total > db_server[0][req.ip].bandwidth.used;
 
   // 任意一个认证不通过就直接拒绝
-  if (!(serverAccess && serverBlock && onlineCount && txSpeedAccess && serverOnlineCount)) {
+  if (!(serverAccess && serverBlock && serverOnlineCount && onlineCount && txSpeedAccess && serverBandwidthAccess)) {
     res.status(404);
     res.send({});
     return;

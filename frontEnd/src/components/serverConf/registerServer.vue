@@ -1,19 +1,117 @@
+<!-- 单个已认证服务器的信息显示 -->
+
 <template>
-  <div>
-    {{ Props.targetIndex }}
-    <br>
-    {{ Props.targetServer }}
+  <div SingleRegisteredServerCard :server-index="Props.targetIndex">
+    <div>
+      <div>
+        <h2>别名</h2>
+      </div>
+      <div>
+        <span> {{ Props.targetServer.alias }} </span>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <h2>域名与地址</h2>
+      </div>
+      <div>
+        <span> {{ Props.targetServer.domain }} </span>
+        <br>
+        <span> {{ Props.targetServer.address }} </span>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <h2>在线</h2>
+      </div>
+      <div>
+        <span> {{ Props.targetServer.nowOnline }} / {{ Props.targetServer.maxOnline }} </span>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <h2>成功认证次数</h2>
+      </div>
+      <div>
+        <span>{{ Props.targetServer.authCount }}</span>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <h2 style="color: red;" >错误次数</h2>
+      </div>
+      <div>
+        <span>{{ genTotalErrorCount() }}</span>
+      </div>
+    </div>
+
+    <div>
+      <div>
+        <h2>操作</h2>
+      </div>
+      <div style="display: flex; gap: 5px; justify-content: center;">
+        <Button size="small">编辑</Button>
+        <Button size="small">重置</Button>
+        <Button size="small">取消认证</Button>
+      </div>
+    </div>
+
+    <!-- <div>
+      {{ Props.targetIndex }}
+      <br>
+      {{ Props.targetServer }}
+    </div> -->
+
+    <div style="min-width: 100%;">
+      <div>
+        <h2>流量用量</h2>
+      </div>
+      <div style="display: flex;gap: 10px;">
+        <ProgressBar style="min-width: 100%;" :value="genProgressBarRate()"> {{ genProgressBarText() }} </ProgressBar>
+      </div>
+    </div>
+
+
+
   </div>
 </template>
 
 
 <script setup>
+import { defineAsyncComponent } from 'vue';
 
-const Props = defineProps(['targetIndex','targetServer']);
 
+const Props = defineProps(['targetIndex', 'targetServer']);
+
+// 动态引入
+const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"));
+
+const genProgressBarText = () => `${Props.targetServer.bandwidth.used} GB / ${Props.targetServer.bandwidth.total} GB`;
+const genProgressBarRate = () => Number((Props.targetServer.bandwidth.used * 100 / Props.targetServer.bandwidth.total).toFixed(2));
+const genTotalErrorCount = () => Props.targetServer.error.method + Props.targetServer.error.body + Props.targetServer.error.reject + Props.targetServer.error.timeout;
 
 </script>
 
 <style scoped>
+div[SingleRegisteredServerCard] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: max-content;
+  box-shadow: 0 0 5px 2px rgb(241, 241, 241);
+  padding: 10px;
+  border-radius: 5px;
+}
 
+div[SingleRegisteredServerCard]>div {
+  flex: 1;
+  text-align: center;
+}
 </style>

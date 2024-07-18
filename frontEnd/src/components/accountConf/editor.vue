@@ -64,7 +64,7 @@ const EditorMain = defineAsyncComponent(() => import("@/components/accountConf/a
 
 // 初始化
 const accountConfStore = useAccountConfStore();
-const dialogStyle = ref({ maxWidth: '50vw', minWidth: `500px` });
+const dialogStyle = ref({ maxWidth: '70vw', minWidth: `500px` });
 const toast = useToast();
 const newAccountInfo = ref({ userName: "", userPassword: "", adminKey: "" });
 const targetAccount = ref({});
