@@ -1,3 +1,5 @@
+<!-- 服务器控制面上方的nav栏 -->
+
 <template>
   <div NavBarBase>
     <div>
@@ -17,13 +19,15 @@
       <Button @click="addNew" size="small">新增</Button>
       <Button @click="freshServerData" size="small">刷新</Button>
     </div>
+    <!-- <div>
+      留给更多操作用的
+    </div> -->
   </div>
 </template>
 
 <script setup>
 import { useHy2ServserStore } from '@/stores/hy2Server';
 import { defineAsyncComponent, ref } from 'vue';
-import { useToast } from 'primevue/usetoast';
 import { useRoute, useRouter } from "vue-router";
 
 // 动态引入
@@ -70,6 +74,7 @@ div[NavBarBase] {
   margin-top: -20px;
   margin-bottom: 10px;
   display: flex;
+  flex-wrap: wrap;
 }
 
 div[NavBarBase]>*:nth-child(1) {
@@ -87,4 +92,9 @@ div[NavBarBase]>*:nth-child(3) {
   display: flex;
   gap: 5px;
 }
+
+/* 留给更多操作用的 */
+/* div[NavBarBase]>*:nth-child(4) {
+  min-width: 100%;
+} */
 </style>

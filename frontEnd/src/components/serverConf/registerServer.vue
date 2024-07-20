@@ -42,7 +42,7 @@
 
     <div>
       <div>
-        <h2 style="color: red;" >错误次数</h2>
+        <h2 style="color: red;">错误次数</h2>
       </div>
       <div>
         <span>{{ genTotalErrorCount() }}</span>
@@ -54,9 +54,9 @@
         <h2>操作</h2>
       </div>
       <div style="display: flex; gap: 5px; justify-content: center;">
-        <Button size="small">编辑</Button>
-        <Button size="small">重置</Button>
-        <Button size="small">取消认证</Button>
+        <Button @click="editServer" size="small">编辑</Button>
+        <Button @click="resetServer" size="small">重置</Button>
+        <Button @click="unAuthServer" size="small">取消认证</Button>
       </div>
     </div>
 
@@ -83,16 +83,34 @@
 
 <script setup>
 import { defineAsyncComponent } from 'vue';
-
-
-const Props = defineProps(['targetIndex', 'targetServer']);
+import { useHy2ServserStore } from '@/stores/hy2Server';
 
 // 动态引入
 const ProgressBar = defineAsyncComponent(() => import("primevue/progressbar"));
 
+const hy2ServerStore = useHy2ServserStore();
+const Props = defineProps(['targetIndex', 'targetServer']);
+
 const genProgressBarText = () => `${Props.targetServer.bandwidth.used} GB / ${Props.targetServer.bandwidth.total} GB`;
 const genProgressBarRate = () => Number((Props.targetServer.bandwidth.used * 100 / Props.targetServer.bandwidth.total).toFixed(2));
 const genTotalErrorCount = () => Props.targetServer.error.method + Props.targetServer.error.body + Props.targetServer.error.reject + Props.targetServer.error.timeout;
+
+// 打开服务器信息编辑器
+const editServer = () => {
+
+}
+
+// 重置服务器信息
+const resetServer = () => {
+  hy2ServerStore.editDialogMode = "resgiter-reset";
+  hy2ServerStore.editIndex = Props.targetIndex;
+  hy2ServerStore.editDialogShow = true;
+}
+
+// 取消认证服务器
+const unAuthServer = () => {
+
+}
 
 </script>
 
@@ -105,9 +123,13 @@ div[SingleRegisteredServerCard] {
   align-items: center;
   width: 100%;
   min-height: max-content;
-  box-shadow: 0 0 5px 2px rgb(241, 241, 241);
   padding: 10px;
   border-radius: 5px;
+  transition: all ease-in-out 0.15s;
+}
+
+div[SingleRegisteredServerCard]:hover {
+  box-shadow: 0 0 5px 2px rgb(225, 225, 225);
 }
 
 div[SingleRegisteredServerCard]>div {
