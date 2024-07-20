@@ -1,20 +1,50 @@
 <template>
   <div registerServerResetBase>
     <div>
+      <Button @click="resetBandwidthUsed" size="small">重置</Button>
       <p>重置服务器已用流量</p>
-      <Button size="small">重置</Button>
     </div>
     <div>
+      <Button @click="resetAllData" size="small">重置</Button>
       <p>重置服务器所有累计记录</p>
-      <Button size="small">重置</Button>
     </div>
     <div style="justify-content: center;">
-      <Button>取消重置</Button>
+      <Button @click="hy2ServerStore.clsoeDialog(false)">取消重置</Button>
     </div>
   </div>
 </template>
 
 <script setup>
+import axios from "axios";
+import { useToast } from "primevue/usetoast";
+import { useHy2ServserStore } from "@/stores/hy2Server";
+
+const hy2ServerStore = useHy2ServserStore();
+const toast = useToast();
+
+const resetBandwidthUsed = () => {
+  const serverAddress = hy2ServerStore.registeredList[hy2ServerStore.editIndex].address;
+  axios.post("/hy2ServerInfo/clearServerBandwidth", { target: serverAddress })
+    .then(axiosRes => {
+      toast.add({ severity: "success", summary: "成功", detail: `${serverAddress} 服务器的已使用流量已完成归零`, life: 1000 });
+      hy2ServerStore.clsoeDialog(true);
+    })
+    .catch(axiosErr => {
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr?.response?.data?.msg || "重置失败", life: 3000 });
+    });
+}
+
+const resetAllData = () => {
+  const serverAddress = hy2ServerStore.registeredList[hy2ServerStore.editIndex].address;
+  axios.post("/hy2ServerInfo/clearServer", { target: serverAddress })
+    .then(axiosRes => {
+      toast.add({ severity: "success", summary: "成功", detail: `${serverAddress} 服务器的所有累计信息完成归零`, life: 1000 });
+      hy2ServerStore.clsoeDialog(true);
+    })
+    .catch(axiosErr => {
+      toast.add({ severity: "error", summary: "错误", detail: axiosErr?.response?.data?.msg || "重置失败", life: 3000 });
+    });
+}
 
 </script>
 
@@ -22,14 +52,20 @@
 div[registerServerResetBase] {
   display: flex;
   flex-direction: column;
+  font-size: 100%;
 }
 
 div[registerServerResetBase]>* {
   display: flex;
   flex-direction: row;
   gap: 20px;
-  margin-bottom: 10px;
   align-items: center;
+  transition: all ease-in-out 0.15s;
+  padding: 10px 30px;
+}
+
+div[registerServerResetBase]>*:hover {
+  background-color: rgb(207, 207, 207);
 }
 
 div[registerServerResetBase]>*:nth-child(1) .p-button,

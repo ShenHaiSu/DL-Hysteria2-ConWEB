@@ -1,1 +1,0 @@
-import{C as d,H as e}from"./index-CIqZCzeW.js";const L=d("hy2Server",()=>{const t=e([]),s=e([]),r=e(""),o=e(!1),i=e("none"),n=e(0),g=e(0);return{registeredList:t,unRegisteredList:s,searchText:r,editDialogShow:o,editDialogMode:i,freshTarget:g,editIndex:n,getRegisteredList:()=>t.value,getUnRegisteredList:()=>s.value}});export{L as u};

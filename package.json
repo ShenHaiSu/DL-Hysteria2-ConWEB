@@ -8,7 +8,9 @@
   "scripts": {
     "build": "cd frontEnd && yarn && yarn run build",
     "dev": "cd frontEnd && yarn && yarn run dev",
-    "run": "cd backEnd && node index.js"
+    "run": "cd backEnd && node index.js",
+    "runB":"cd backEnd && node index.js",
+    "runFDev":"cd frontEnd && yarn run dev"
   },
   "dependencies": {}
 }

@@ -7,6 +7,8 @@
         <h2>别名</h2>
       </div>
       <div>
+        <span></span>
+        <br>
         <span> {{ Props.targetServer.alias }} </span>
       </div>
     </div>
@@ -26,7 +28,9 @@
       <div>
         <h2>在线</h2>
       </div>
-      <div>
+      <div v-tooltip.bottom="{ value: genNowOnlineText(), autoHide: false }">
+        <span></span>
+        <br>
         <span> {{ Props.targetServer.nowOnline }} / {{ Props.targetServer.maxOnline }} </span>
       </div>
     </div>
@@ -36,6 +40,8 @@
         <h2>成功认证次数</h2>
       </div>
       <div>
+        <span></span>
+        <br>
         <span>{{ Props.targetServer.authCount }}</span>
       </div>
     </div>
@@ -44,7 +50,9 @@
       <div>
         <h2 style="color: red;">错误次数</h2>
       </div>
-      <div>
+      <div v-tooltip.bottom="{ value: genErrorCountText(), autoHide: false }">
+        <span></span>
+        <br>
         <span>{{ genTotalErrorCount() }}</span>
       </div>
     </div>
@@ -94,6 +102,8 @@ const Props = defineProps(['targetIndex', 'targetServer']);
 const genProgressBarText = () => `${Props.targetServer.bandwidth.used} GB / ${Props.targetServer.bandwidth.total} GB`;
 const genProgressBarRate = () => Number((Props.targetServer.bandwidth.used * 100 / Props.targetServer.bandwidth.total).toFixed(2));
 const genTotalErrorCount = () => Props.targetServer.error.method + Props.targetServer.error.body + Props.targetServer.error.reject + Props.targetServer.error.timeout;
+const genNowOnlineText = () => Object.keys(Props.targetServer.onlineList).map(key => `${key}: ${Props.targetServer.onlineList[key]}`).join("\n");
+const genErrorCountText = () => `方法错误：${Props.targetServer.error.method}\n请求体错误：${Props.targetServer.error.body}\n拒绝认证：${Props.targetServer.error.reject}\n超时错误：${Props.targetServer.error.timeout}\n`;
 
 // 打开服务器信息编辑器
 const editServer = () => {
@@ -109,7 +119,14 @@ const resetServer = () => {
 
 // 取消认证服务器
 const unAuthServer = () => {
-
+  // axios.post("/hy2ServerInfo/unRegisterServer", { target: Props.targetServer.address })
+  //   .then(() => {
+  //     toast.add({ severity: "success", summary: "成功", detail: `已将${Props.targetServer.address}服务器取消认证，可以在未认证服务器面板中查看信息。`, life: 1000 });
+  //     hy2ServerStore.freshTarget++;
+  //   })
+  //   .catch(axiosErr => {
+  //     toast.add({ severity: "error", summary: "失败", detail: axiosErr?.response?.data?.msg || '请求失败', life: 3000 });
+  //   })
 }
 
 </script>

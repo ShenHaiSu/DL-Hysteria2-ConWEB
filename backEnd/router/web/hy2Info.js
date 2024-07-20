@@ -1,3 +1,7 @@
+/**
+ * 访问路径 /hy2ServerInfo
+ */
+
 const express = require("express");
 const router = express.Router();
 const tools = require("../../tools.js");
@@ -140,7 +144,7 @@ router.post("/clearServer", (req, res, next) => {
         lastConnect: 0,
         onlineList: {},
         error: { method: 0, body: 0, reject: 0, timeout: 0 },
-        bandwidth: { used: 0 }
+        bandwidth: { total: db_server[0][targetServerIP].bandwidth.total, used: 0 }
       })
   } else if (db_server[1][targetServerIP]) {
     db_server[1][targetServerIP] = Object.assign(
@@ -160,6 +164,22 @@ router.post("/clearServer", (req, res, next) => {
   } else {
     res.status(200);
     res.send({ error, msg: `已经清空服务器${targetServerIP}。` });
+  }
+})
+
+// 清除执行服务器的已使用带宽
+router.post("/clearServerBandwidth", (req, res, next) => {
+  // 检查body内容
+  if (!req.body['target'] || req.body['target'] == "") return rejectResponse(req, res, next);
+
+  // 检查并清空已使用的带宽
+  if (db_server[0][req.body['target']]) {
+    db_server[0][req.body['target']].bandwidth.used = 0;
+    res.status(200);
+    res.send({ error: false, msg: "完成重置" });
+  } else {
+    res.status(500);
+    res.send({ error: true, msg: "该服务器不存在" });
   }
 })
 
