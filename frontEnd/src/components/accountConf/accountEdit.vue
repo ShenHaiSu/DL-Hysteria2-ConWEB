@@ -57,7 +57,7 @@
         </div>
         <div ServerPermissionEditContainer>
           <div ServerPermissionEdit :class="genServerLineClass(server)" v-for="server in serverPermissionTempList">
-            <div style="flex: 1;padding: 0.7rem;">
+            <div style="flex: 1;padding: 0.7rem 0.7rem 0.7rem 0.1rem;">
               {{ server.alias }}
             </div>
             <div class="space" style="min-width: 10px;"></div>

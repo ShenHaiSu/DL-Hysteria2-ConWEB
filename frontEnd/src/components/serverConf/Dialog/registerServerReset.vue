@@ -1,11 +1,11 @@
 <template>
   <div registerServerResetBase>
     <div>
-      <Button @click="resetBandwidthUsed" size="small">重置</Button>
+      <Button @click="resetBandwidthUsed" severity="secondary" size="small">重置</Button>
       <p>重置服务器已用流量</p>
     </div>
     <div>
-      <Button @click="resetAllData" size="small">重置</Button>
+      <Button @click="resetAllData" severity="secondary" size="small">重置</Button>
       <p>重置服务器所有累计记录</p>
     </div>
     <div style="justify-content: center;">
@@ -62,10 +62,11 @@ div[registerServerResetBase]>* {
   align-items: center;
   transition: all ease-in-out 0.15s;
   padding: 10px 30px;
+  border-radius: 5px;
 }
 
 div[registerServerResetBase]>*:hover {
-  background-color: rgb(207, 207, 207);
+  background-color: rgb(236, 236, 236);
 }
 
 div[registerServerResetBase]>*:nth-child(1) .p-button,

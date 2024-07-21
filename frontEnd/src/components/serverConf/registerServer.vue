@@ -107,7 +107,9 @@ const genErrorCountText = () => `方法错误：${Props.targetServer.error.metho
 
 // 打开服务器信息编辑器
 const editServer = () => {
-
+  hy2ServerStore.editDialogMode = "resgiter-edit";
+  hy2ServerStore.editIndex = Props.targetIndex;
+  hy2ServerStore.editDialogShow = true;
 }
 
 // 重置服务器信息
@@ -119,14 +121,9 @@ const resetServer = () => {
 
 // 取消认证服务器
 const unAuthServer = () => {
-  // axios.post("/hy2ServerInfo/unRegisterServer", { target: Props.targetServer.address })
-  //   .then(() => {
-  //     toast.add({ severity: "success", summary: "成功", detail: `已将${Props.targetServer.address}服务器取消认证，可以在未认证服务器面板中查看信息。`, life: 1000 });
-  //     hy2ServerStore.freshTarget++;
-  //   })
-  //   .catch(axiosErr => {
-  //     toast.add({ severity: "error", summary: "失败", detail: axiosErr?.response?.data?.msg || '请求失败', life: 3000 });
-  //   })
+  hy2ServerStore.editDialogMode = "resgiter-unauth";
+  hy2ServerStore.editIndex = Props.targetIndex;
+  hy2ServerStore.editDialogShow = true;
 }
 
 </script>

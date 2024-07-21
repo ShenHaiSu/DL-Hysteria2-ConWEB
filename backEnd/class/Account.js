@@ -1,3 +1,5 @@
+const tools = require("../tools.js");
+
 module.exports.Account = class {
   constructor(name, password, isAdmin) {
     this.userName = name;
