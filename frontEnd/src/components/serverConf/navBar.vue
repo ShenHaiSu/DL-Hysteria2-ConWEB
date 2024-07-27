@@ -9,10 +9,8 @@
       </InputGroup>
     </div>
     <div>
-      <Button @click="Router.push('/serverConf/registerServer')" size="small"
-        :severity="genPageSeverity('auth')">已认证服务器</Button>
-      <Button @click="Router.push('/serverConf/unRegisterServer')" size="small"
-        :severity="genPageSeverity('unauth')">未认证服务器</Button>
+      <Button @click="Router.push('/serverConf/registerServer')" size="small" :severity="genPageSeverity('auth')">已认证服务器</Button>
+      <Button @click="Router.push('/serverConf/unRegisterServer')" size="small" :severity="genPageSeverity('unauth')">未认证服务器</Button>
     </div>
     <div>
       <Button disabled size="small" text severity="secondary">更多操作</Button>
