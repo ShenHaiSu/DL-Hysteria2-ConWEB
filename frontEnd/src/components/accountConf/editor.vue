@@ -1,3 +1,5 @@
+<!-- 账号编辑的Dialog内容 -->
+
 <template>
   <Dialog v-model:visible="accountConfStore.editorShow" :header="genDialogTitle" :style="dialogStyle">
     <!-- 添加新账号编辑框 -->

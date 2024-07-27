@@ -2,8 +2,16 @@
 
 <template>
   <div>
-    <RegisterServer v-for="(server, index) in hy2ServerStore.registeredList" :target-index="index"
-      :target-server="server" :class="genBaseCLass(server)" />
+    <!-- <RegisterServer v-for="(server, index) in hy2ServerStore.registeredList" :target-index="index"
+      :target-server="server" :class="genBaseCLass(server)" /> -->
+
+    <table>
+      <thead>
+        <tr>
+          <td></td>
+        </tr>
+      </thead>
+    </table>
   </div>
 </template>
 
@@ -40,7 +48,7 @@ const freshRegisterServerList = () => {
 }
 
 // 启动自动更新
-onMounted(() => freshRegisterServerList())
+onMounted(() => freshRegisterServerList());
 
 // 监听Pinia的刷新触发器
 watch(() => hy2ServerStore.freshTarget, () => freshRegisterServerList());
@@ -55,6 +63,6 @@ const genBaseCLass = (server) => {
 
 <style scoped>
 div.hide {
-  display: none;
+  display: none !important;
 }
 </style>

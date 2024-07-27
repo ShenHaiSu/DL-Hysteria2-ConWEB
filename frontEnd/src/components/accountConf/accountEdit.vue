@@ -1,3 +1,5 @@
+<!-- 账户信息编辑Dialog内主界面 -->
+
 <template>
   <div>
     <div AccountEditMainBase>
@@ -129,6 +131,7 @@ serverPermissionTempList.value = hy2ServerStore.registeredList.map(server => {
   if (targetAccount.value.userInfo.blockServer.some(block => block == server.alias)) return { ...server, permission: -1, show: true };
   return { ...server, permission: 0, show: true };
 });
+
 searchText.value = "";
 
 const genTxSpeedMb = (txSpeed) => txSpeed ? (txSpeed / 125000).toFixed(2) : 0;

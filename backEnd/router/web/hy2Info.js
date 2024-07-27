@@ -78,6 +78,34 @@ router.post("/registerServer", (req, res, next) => {
   res.status(200);
 })
 
+// 编辑已认证的hy2服务器
+router.post("/editServer", (req, res, next) => {
+  // 检查body内容
+  const bodyPropList = ["target","domain", "alias", "port", "maxOnline", "infoPort", "infoAuthKey", "maxBandwidth"]; // 待编辑的属性
+  if (bodyPropList.some(prop => !Object.hasOwnProperty.call(req.body, prop))) return rejectResponse(req, res, next);
+
+  // 检查别名是否重复
+  const targetServerAlias = req.body['alias'];
+  const targetServerIndex = db_server[0].findIndex(server => server.alias == targetServerAlias && server.ip != req.body['target']);
+  if (targetServerIndex != -1) return rejectResponse(req, res, next);
+
+  // 编辑服务器信息
+  const targetServerIP = req.body['target'];
+  const targetServer = db_server[0][targetServerIP];
+  if (!targetServer) return rejectResponse(req, res, next);
+  targetServer.alias = req.body['alias'];
+  targetServer.port = req.body['port'];
+  targetServer.maxOnline = req.body['maxOnline'];
+  targetServer.infoPort = req.body['infoPort'];
+  targetServer.infoAuthKey = req.body['infoAuthKey'];
+  targetServer.bandwidth.total = req.body['maxBandwidth'];
+  targetServer.domain = req.body['domain'] || "";
+
+  // 响应客户端
+  res.status(200);
+  res.send({ error: false, msg: `已编辑服务器${targetServerIP}的信息。` });
+})
+
 // 取消认证服务器
 router.post("/unRegisterServer", (req, res, next) => {
   // 检查body内容
