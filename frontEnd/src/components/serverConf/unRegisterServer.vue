@@ -20,8 +20,8 @@
       <h2>操作</h2>
       <div UnAuthServerActionBase>
         <Button @click="deleteUnRegisterServer">删除</Button>
-        <Button @click="clearUnRegisterServer" >清空</Button>
-        <Button @click="authServer" >认证</Button>
+        <Button @click="clearUnRegisterServer">清空</Button>
+        <Button @click="authServer">认证</Button>
       </div>
     </div>
     <!-- <div>
@@ -70,6 +70,7 @@ const deleteUnRegisterServer = () => {
 const clearUnRegisterServer = () => {
   axios.post("/hy2ServerInfo/clearServer", { target: Props.targetServer.address })
     .then(axiosRes => {
+      hy2ServerStore.freshTarget++;
       toast.add({ severity: 'success', summary: '清空成功', detail: '该服务器的统计数据已清空', life: 1000 });
     })
     .catch(axiosErr => {

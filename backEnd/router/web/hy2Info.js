@@ -76,7 +76,7 @@ router.post("/registerServer", (req, res, next) => {
   // 删除未认证服务器对象
   try {
     if (db_server[1][req.body['target']]) delete db_server[1][req.body['target']];
-  } catch {}
+  } catch { }
 
   res.status(200);
   res.send({ error: false, msg: `已成功添加服务器${req.body['target']}到已认证服务器列表。` });
@@ -186,6 +186,7 @@ router.post("/clearServer", (req, res, next) => {
       db_server[1][targetServerIP],
       {
         lastConnect: 0,
+        connectCount: 0,
         error: { method: 0, body: 0 }
       })
   } else {
