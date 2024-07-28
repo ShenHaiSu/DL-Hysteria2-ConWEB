@@ -52,6 +52,6 @@ const genBaseCLass = (server) => {
 
 <style scoped>
 div.hide {
-  display: none  !important;
+  display: none !important;
 }
 </style>

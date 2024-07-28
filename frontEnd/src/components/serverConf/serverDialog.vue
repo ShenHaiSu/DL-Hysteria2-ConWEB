@@ -4,8 +4,9 @@
   <Dialog v-model:visible="hy2ServerStore.editDialogShow" modal :header="genDialogHeader()">
     <AddBlankServer v-if="hy2ServerStore.editDialogMode == 'add'" />
     <RegisterServerReset v-if="hy2ServerStore.editDialogMode == 'resgiter-reset'" />
-    <UnAuthServer v-if="hy2ServerStore.editDialogMode == 'resgiter-unauth'" />
+    <RegisterServerUnRegister v-if="hy2ServerStore.editDialogMode == 'resgiter-unauth'" />
     <RegisterServerEdit v-if="hy2ServerStore.editDialogMode == 'resgiter-edit'" />
+    <UnRegisterServerRegister v-if="hy2ServerStore.editDialogMode == 'unregister-register'" />
   </Dialog>
 </template>
 
@@ -17,8 +18,9 @@ import { useHy2ServserStore } from "@/stores/hy2Server.js";
 const Dialog = defineAsyncComponent(() => import("primevue/dialog"));
 const AddBlankServer = defineAsyncComponent(() => import("@/components/serverConf/Dialog/addBlankServer.vue"));
 const RegisterServerReset = defineAsyncComponent(() => import("@/components/serverConf/Dialog/registerServerReset.vue"));
-const UnAuthServer = defineAsyncComponent(() => import("@/components/serverConf/Dialog/unAuthServer.vue"));
+const RegisterServerUnRegister = defineAsyncComponent(() => import("@/components/serverConf/Dialog/registerServerUnRegister.vue"));
 const RegisterServerEdit = defineAsyncComponent(() => import("@/components/serverConf/Dialog/registerServerEdit.vue"));
+const UnRegisterServerRegister = defineAsyncComponent(() => import("@/components/serverConf/Dialog/unRegisterServerRegister.vue"));
 
 // 初始化
 const hy2ServerStore = useHy2ServserStore();
@@ -36,6 +38,8 @@ const genDialogHeader = () => {
       return "取消认证服务器";
     case "resgiter-edit":
       return "编辑服务器信息";
+    case "unregister-register":
+      return "认证服务器";
     default:
       return "错误的索引信息导致无标题可显示。";
   }

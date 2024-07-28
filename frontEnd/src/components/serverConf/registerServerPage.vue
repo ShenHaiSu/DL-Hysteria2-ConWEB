@@ -2,16 +2,8 @@
 
 <template>
   <div>
-    <!-- <RegisterServer v-for="(server, index) in hy2ServerStore.registeredList" :target-index="index"
-      :target-server="server" :class="genBaseCLass(server)" /> -->
-
-    <table>
-      <thead>
-        <tr>
-          <td></td>
-        </tr>
-      </thead>
-    </table>
+    <RegisterServer v-for="(server, index) in hy2ServerStore.registeredList" :target-index="index"
+      :target-server="server" :class="genBaseCLass(server)" />
   </div>
 </template>
 

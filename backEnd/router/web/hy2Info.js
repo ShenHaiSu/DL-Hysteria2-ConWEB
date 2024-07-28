@@ -1,5 +1,6 @@
 /**
  * 访问路径 /hy2ServerInfo
+ * 这个路径强制要求所有的api都需要有管理员权限才可以访问
  */
 
 const express = require("express");
@@ -81,18 +82,21 @@ router.post("/registerServer", (req, res, next) => {
 // 编辑已认证的hy2服务器
 router.post("/editServer", (req, res, next) => {
   // 检查body内容
-  const bodyPropList = ["target","domain", "alias", "port", "maxOnline", "infoPort", "infoAuthKey", "maxBandwidth"]; // 待编辑的属性
+  const bodyPropList = ["target", "domain", "alias", "port", "maxOnline", "infoPort", "infoAuthKey", "maxBandwidth"]; // 待编辑的属性
   if (bodyPropList.some(prop => !Object.hasOwnProperty.call(req.body, prop))) return rejectResponse(req, res, next);
 
-  // 检查别名是否重复
-  const targetServerAlias = req.body['alias'];
-  const targetServerIndex = db_server[0].findIndex(server => server.alias == targetServerAlias && server.ip != req.body['target']);
-  if (targetServerIndex != -1) return rejectResponse(req, res, next);
-
-  // 编辑服务器信息
+  // 获取目标服务器对象
   const targetServerIP = req.body['target'];
   const targetServer = db_server[0][targetServerIP];
   if (!targetServer) return rejectResponse(req, res, next);
+
+  // 检查别名是否重复
+  if (targetServer.alias != req.body['alias']) {
+    const targetServerIndex = Object.values(db_server[0]).findIndex(server => server.alias == req.body['alias']);
+    if (targetServerIndex != -1) return rejectResponse(req, res, next);
+  }
+
+  // 编辑服务器信息
   targetServer.alias = req.body['alias'];
   targetServer.port = req.body['port'];
   targetServer.maxOnline = req.body['maxOnline'];
@@ -209,6 +213,37 @@ router.post("/clearServerBandwidth", (req, res, next) => {
     res.status(500);
     res.send({ error: true, msg: "该服务器不存在" });
   }
+})
+
+// 测试hy2服务连通性
+router.post("/testServer", (req, res, next) => {
+  // 检查body内容
+  if ((!req.body['target'] || req.body['target'] == "") || (!req.body['domain'] || req.body['domain'] == "")) return rejectResponse(req, res, next);
+  if (!req.body['port'] || req.body['port'] == "") return rejectResponse(req, res, next);
+  if (!req.body['authkey'] || req.body['authkey'] == "") return rejectResponse(req, res, next);
+
+  // 记录开始时间戳
+  const startTime = new Date().getTime();
+
+  // 构建目标地址
+  const targetAddress = `http://${(req.body['domain']) ? req.body['domain'] : req.body['target']}:${req.body['port']}/online`;
+
+  // 发送测试请求
+  fetch(targetAddress, { timeout: 5000, headers: { "Authorization": req.body['authkey'] } })
+    .then(response => {
+      if (response.ok) {
+        const responseTime = new Date().getTime() - startTime;
+        res.status(200);
+        res.send({ error: false, msg: "服务器连接成功", responseTime });
+      } else {
+        res.status(500);
+        res.send({ error: true, msg: "服务器连接失败" });
+      }
+    })
+    .catch(error => {
+      res.status(500);
+      res.send({ error: true, msg: "服务器连接失败" });
+    })
 })
 
 // 错误承接

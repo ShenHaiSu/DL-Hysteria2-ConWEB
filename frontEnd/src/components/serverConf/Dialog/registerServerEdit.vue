@@ -28,7 +28,7 @@
               <template v-for="(port, index) in innerObj.port">
                 <InputText v-model="innerObj.port[index]" @change="portInputChangeHandle(index)" />
               </template>
-              <Button @click="innerObj.port.push('')" severity="secondary" outlined="" size="small">添加</Button>
+              <Button @click="innerObj.port.push('')" severity="secondary" outlined size="small">添加</Button>
             </td>
           </tr>
           <tr>
@@ -41,6 +41,14 @@
             <td>api秘钥</td>
             <td>
               <InputText v-model="innerObj.infoAuthKey" />
+            </td>
+          </tr>
+          <tr>
+            <td>api连通性</td>
+            <td>
+              <Button @click="testClick" style="width: 100%;" severity="secondary" outlined size="small">
+                {{ apiTestText }}
+              </Button>
             </td>
           </tr>
           <tr>
@@ -115,9 +123,9 @@
 
     <!-- 操作栏 -->
     <div ActionDiv>
-      <Button @click="resetFullObj" severity="info">重置</Button>
+      <Button @click="resetFullObj" severity="secondary">重置</Button>
       <Divider layout="vertical" />
-      <Button @click="cancelClick">取消</Button>
+      <Button @click="cancelClick" severity="secondary" >取消</Button>
       <Divider layout="vertical" />
       <Button @click="updateClick">确定</Button>
     </div>
@@ -133,12 +141,12 @@ import { ref } from 'vue';
 
 // 动态引入
 const Divider = defineAsyncComponent(() => import('primevue/divider'));
-const IconSlash = defineAsyncComponent(() => import("@/components/icons/IconSlash.vue"));
 
 // 初始化
 const hy2ServerStore = useHy2ServserStore();
 const toast = useToast();
 const innerObj = ref({});
+const apiTestText = ref('测试');
 
 // 初始化函数
 const initData = () => {
@@ -162,6 +170,22 @@ const cancelClick = () => {
 const portInputChangeHandle = (index) => {
   if (innerObj.value.port[index].length != 0) return;
   innerObj.value.port.splice(index, 1);
+}
+
+// 测试按钮点击事件
+const testClick = () => {
+  axios.post('/hy2ServerInfo/testServer', {
+    target: innerObj.value.address,
+    domain: innerObj.value.domain,
+    port: innerObj.value.infoPort,
+    authkey: innerObj.value.infoAuthKey,
+  })
+    .then(axiosRes => {
+      apiTestText.value = `成功 ${(axiosRes.data.responseTime / 1000).toFixed(2)}s`;
+    })
+    .catch(axiosErr => {
+      apiTestText.value = `失败`;
+    })
 }
 
 // 确定按钮点击事件
