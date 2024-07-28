@@ -174,6 +174,11 @@ const portInputChangeHandle = (index) => {
 
 // 测试按钮点击事件
 const testClick = () => {
+  // 短接阻断
+  if (apiTestText.value === '测试中...') return;
+  apiTestText.value = '测试中...';
+  
+  // 发送请求
   axios.post('/hy2ServerInfo/testServer', {
     target: innerObj.value.address,
     domain: innerObj.value.domain,

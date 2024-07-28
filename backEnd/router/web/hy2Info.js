@@ -59,7 +59,7 @@ router.get("/allUnregistered", (req, res, next) => {
 // 认证hy2服务器
 router.post("/registerServer", (req, res, next) => {
   // 检查body内容
-  const bodyPropList = ["target", "alias", "port", "maxOnline", "infoPort", "infoAuthkey", "maxBandwidth"];
+  const bodyPropList = ["target", "alias", "port", "maxOnline", "infoPort", "infoAuthKey", "maxBandwidth"];
   if (bodyPropList.some(prop => !Object.hasOwnProperty.call(req.body, prop))) return rejectResponse(req, res, next);
 
   // 创建新的认证服务器对象
@@ -69,14 +69,17 @@ router.post("/registerServer", (req, res, next) => {
   newServer.port = req.body['port'];
   newServer.maxOnline = req.body['maxOnline'];
   newServer.infoPort = req.body['infoPort'];
-  newServer.infoAuthKey = req.body['infoAuthkey'];
+  newServer.infoAuthKey = req.body['infoAuthKey'];
   newServer.bandwidth.total = req.body['maxBandwidth'];
   db_server[0][req.body['target']] = newServer;
 
   // 删除未认证服务器对象
-  if (db_server[1][req.body['target']]) delete db_server[1][req.body['target']];
+  try {
+    if (db_server[1][req.body['target']]) delete db_server[1][req.body['target']];
+  } catch {}
 
   res.status(200);
+  res.send({ error: false, msg: `已成功添加服务器${req.body['target']}到已认证服务器列表。` });
 })
 
 // 编辑已认证的hy2服务器

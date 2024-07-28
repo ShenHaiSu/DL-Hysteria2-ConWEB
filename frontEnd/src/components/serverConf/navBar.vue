@@ -14,7 +14,7 @@
     </div>
     <div>
       <Button disabled size="small" text severity="secondary">更多操作</Button>
-      <Button @click="addNew" size="small">新增</Button>
+      <Button @click="addNew" size="small">新增认证服务器</Button>
       <Button @click="freshServerData" size="small">刷新</Button>
     </div>
     <!-- <div>

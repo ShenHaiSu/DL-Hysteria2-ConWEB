@@ -5,8 +5,8 @@ module.exports.RegisteredServer = class {
   maxOnline = 0;
   nowOnline = 0;
   authCount = 0;
-  firstConnect;
-  lastConnect;
+  firstConnect = 0;
+  lastConnect = 0;
   onlineList = {};
   infoPort = "";
   infoAuthKey = "";
