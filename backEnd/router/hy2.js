@@ -52,15 +52,15 @@ router.post("/auth", (req, res, next) => {
   const targetAccount = db_account[targetAccountIndex];
   
   // 检查服务器是否在允许范围内
-  const serverAccess = targetAccount.accessServer.some(alias => db_server[0][req.ip].alias == alias);
+  const serverAccess = targetAccount.userInfo.accessServer.some(alias => db_server[0][req.ip].alias == alias);
   // 检查服务器是否不在禁止范围内
-  const serverBlock = !targetAccount.blockServer.some(alias => db_server[0][req.ip].alias == alias);
+  const serverBlock = !targetAccount.userInfo.blockServer.some(alias => db_server[0][req.ip].alias == alias);
   // 检查服务器加上当前在线是否依然不超限制
   const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
   // 检测用户加上当前在线是否依然不超限制
-  const onlineCount = (targetAccount.nowOnline + 1) <= targetAccount.maxOnline;
+  const onlineCount = (targetAccount.userInfo.nowOnline + 1) <= targetAccount.userInfo.maxOnline;
   // 检测用户请求的速度是否不超限制
-  const txSpeedAccess = req.body['tx'] <= targetAccount.txSpeed;
+  const txSpeedAccess = req.body['tx'] <= targetAccount.userInfo.txSpeed;
   // 检测用户请求的速度是否超过服务器的上限
   const serverBandwidthAccess = db_server[0][req.ip].bandwidth.total > db_server[0][req.ip].bandwidth.used;
 
