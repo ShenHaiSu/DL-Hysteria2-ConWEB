@@ -8,6 +8,7 @@ const fs = require("node:fs");
 const https = require('node:https');
 const bodyParser = require("body-parser")
 const cookieParser = require('cookie-parser');
+const { startLoopTasks } = require("./tasks/main.js");
 
 
 // 压缩
@@ -55,4 +56,6 @@ const httpsOptions = {
 https.createServer(httpsOptions, app).listen(appConfig.serverPort, () => {
   tools.log(`Server is running, on Port ${appConfig.serverPort}`);
   tools.log(`LocakLink: https://127.0.0.1:${appConfig.serverPort}`);
+  startLoopTasks();
+  tools.log(`Start Loop Tasks`);
 });

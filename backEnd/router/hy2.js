@@ -40,24 +40,31 @@ router.use((req, res, next) => {
 
 // 面向外部hy2的认证接口
 router.post("/auth", (req, res, next) => {
-  // 检查获取对应账户
-  const targetAccountIndex = db_account.findIndex(account => account.userInfo.linkKey && account.userInfo.linkKey == req.body['auth']);
+  // 获取账户索引
+  const targetAccountIndex = db_account.findIndex(account => account.userInfo.hy2Key && account.userInfo.hy2Key == req.body['auth']);
   if (targetAccountIndex == -1) {
     res.status(404);
     res.send();
     return;
   }
 
+  // 获取对应账户
   const targetAccount = db_account[targetAccountIndex];
-  // 检查认证
+  
+  // 检查服务器是否在允许范围内
   const serverAccess = targetAccount.accessServer.some(alias => db_server[0][req.ip].alias == alias);
+  // 检查服务器是否不在禁止范围内
   const serverBlock = !targetAccount.blockServer.some(alias => db_server[0][req.ip].alias == alias);
+  // 检查服务器加上当前在线是否依然不超限制
   const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
+  // 检测用户加上当前在线是否依然不超限制
   const onlineCount = (targetAccount.nowOnline + 1) <= targetAccount.maxOnline;
+  // 检测用户请求的速度是否不超限制
   const txSpeedAccess = req.body['tx'] <= targetAccount.txSpeed;
+  // 检测用户请求的速度是否超过服务器的上限
   const serverBandwidthAccess = db_server[0][req.ip].bandwidth.total > db_server[0][req.ip].bandwidth.used;
 
-  // 任意一个认证不通过就直接拒绝
+  // 检查是否通过认证
   if (!(serverAccess && serverBlock && serverOnlineCount && onlineCount && txSpeedAccess && serverBandwidthAccess)) {
     res.status(404);
     res.send({});
