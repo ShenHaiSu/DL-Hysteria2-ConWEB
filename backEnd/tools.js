@@ -1,13 +1,13 @@
 const fs = require("node:fs");
 const path = require("node:path");
+const { PanelConfig } = require("./class/PanelConfig.js");
 
 module.exports.runtimeDate = {
   adminKey: "",
   dbAutosaveTimer: null,
-}
+};
 
-module.exports.db = {
-}
+module.exports.db = {};
 
 /**
  * 根据要求的长度和特定样本池生成随机字符串
@@ -175,4 +175,14 @@ module.exports.db_getObj = (name) => {
   if (this.db[name]) return this.db[name];
   this.db[name] = [];
   return this.db[name];
+}
+
+/**
+ * 从数据库中获取面板配置对象
+ * @returns {{PanelConfig}} 面板配置对象
+ */
+module.exports.db_getObj_panelConfig = () => {
+  const panelConfigList = this.db_getObj("panelConfig");
+  if (panelConfigList.length == 0) panelConfigList.push(new PanelConfig());
+  return panelConfigList[0];
 }

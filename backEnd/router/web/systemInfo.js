@@ -202,7 +202,12 @@ const get_ipInfo = () => {
 
   for (const key in interfaces) {
     if (!Object.hasOwnProperty.call(interfaces, key)) continue;
-    for (let i = 0; i < interfaces[key].length; i++) result.push(interfaces[key][i].address);
+    for (let i = 0; i < interfaces[key].length; i++) {
+      if (interfaces[key][i].address == "127.0.0.1") continue;
+      if (interfaces[key][i].address == "::1") continue;
+      if (interfaces[key][i].address.startsWith("192.168")) continue;
+      result.push(interfaces[key][i].address);
+    }
   }
 
   return result;

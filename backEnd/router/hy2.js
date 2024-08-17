@@ -5,8 +5,8 @@ const tools = require("../tools.js");
 // 初始化
 const db_server = tools.db_getObj("servers");
 const db_account = tools.db_getObj("accounts");
+const db_pannelConfig = tools.db_getObj_panelConfig();
 if (db_server.length == 0) db_server.push({}, {});
-
 
 // 认证服务器类
 const { RegisteredServer } = require("../class/RegisteredServer.js");
@@ -50,11 +50,13 @@ router.post("/auth", (req, res, next) => {
 
   // 获取对应账户
   const targetAccount = db_account[targetAccountIndex];
-  
-  // 检查服务器是否在允许范围内
-  const serverAccess = targetAccount.userInfo.accessServer.some(alias => db_server[0][req.ip].alias == alias);
+
   // 检查服务器是否不在禁止范围内
   const serverBlock = !targetAccount.userInfo.blockServer.some(alias => db_server[0][req.ip].alias == alias);
+  // 检查服务器是否在允许范围内
+  const serverAccess = targetAccount.userInfo.accessServer.some(alias => db_server[0][req.ip].alias == alias);
+  // 检查面板默认配置是否允许链接
+  const defaultPermission = db_pannelConfig.defaultServerPermission;
   // 检查服务器加上当前在线是否依然不超限制
   const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
   // 检测用户加上当前在线是否依然不超限制
@@ -65,7 +67,7 @@ router.post("/auth", (req, res, next) => {
   const serverBandwidthAccess = db_server[0][req.ip].bandwidth.total > db_server[0][req.ip].bandwidth.used;
 
   // 检查是否通过认证
-  if (!(serverAccess && serverBlock && serverOnlineCount && onlineCount && txSpeedAccess && serverBandwidthAccess)) {
+  if (!((serverAccess || defaultPermission) && serverBlock && serverOnlineCount && onlineCount && txSpeedAccess && serverBandwidthAccess)) {
     res.status(404);
     res.send({});
     return;
