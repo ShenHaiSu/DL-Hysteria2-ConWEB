@@ -3,7 +3,7 @@ const router = express.Router();
 const tools = require("../../tools.js");
 
 // 获取accounts数据对象
-const db_account = tools.db_getObj("accounts");
+const db_account = tools.db_getList("accounts");
 const adminKey = tools.runtimeDate.adminKey;
 
 // 定义 account 类

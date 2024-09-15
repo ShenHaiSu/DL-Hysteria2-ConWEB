@@ -1,6 +1,6 @@
 const tools = require('../tools');
-const db_account = tools.db_getObj("accounts");
-const db_server = tools.db_getObj("servers");
+const db_account = tools.db_getList("accounts");
+const db_server = tools.db_getList("servers");
 
 // 运行时记录
 const runtimeDate = {

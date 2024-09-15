@@ -1,6 +1,6 @@
 <script setup>
-import { RouterLink, RouterView,useRoute } from 'vue-router'
-import { ref, reactive, defineAsyncComponent, KeepAlive } from 'vue';
+import { RouterView, useRoute } from 'vue-router'
+import { defineAsyncComponent } from 'vue';
 
 // 动态引入
 const AsideBar = defineAsyncComponent(() => import("@/components/common/AsideBar.vue"));
@@ -21,12 +21,12 @@ const route = useRoute();
         <TitleCard />
       </div>
       <div class="mainContainer">
-      <RouterView v-slot="{ Component }">  
-        <KeepAlive>
-          <component :is="Component" v-if="route.meta.keepAlive"  />
-        </KeepAlive>
-          <component :is="Component" v-if="!route.meta.keepAlive"  />
-      </RouterView>
+        <RouterView v-slot="{ Component }">
+          <KeepAlive>
+            <component :is="Component" v-if="route.meta.keepAlive" />
+          </KeepAlive>
+          <component :is="Component" v-if="!route.meta.keepAlive" />
+        </RouterView>
       </div>
     </div>
   </div>

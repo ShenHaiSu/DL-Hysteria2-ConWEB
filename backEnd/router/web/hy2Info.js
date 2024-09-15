@@ -8,8 +8,8 @@ const router = express.Router();
 const tools = require("../../tools.js");
 
 // 获取accounts数据对象
-const db_account = tools.db_getObj("accounts");
-const db_server = tools.db_getObj("servers");
+const db_account = tools.db_getList("accounts");
+const db_server = tools.db_getList("servers");
 
 // 工具函数
 const rejectResponse = (req, res, next) => {

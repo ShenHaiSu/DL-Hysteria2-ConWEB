@@ -12,7 +12,7 @@ const systeminfomation = require("systeminformation");
 const router = express.Router();
 const tools = require("../../tools.js");
 
-const db_account = tools.db_getObj("accounts");
+const db_account = tools.db_getList("accounts");
 const runtimeData = {
   cpuTimeSave: {
     user: 0,

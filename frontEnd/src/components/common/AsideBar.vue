@@ -63,6 +63,10 @@ const menuContent = reactive([
     command: () => router.push("/accountConf")
   },
   {
+    label:"面板控制面",
+    command:() => router.push("/panelConf")
+  },
+  {
     label: "关于",
     command: () => router.push("/about"),
   },

@@ -167,22 +167,23 @@ module.exports.db_autosave = () => {
 }
 
 /**
- * 获取数据表已进行操作，数据表类型都是数组
+ * 获取数据表已进行操作，数据表类型都是基础对象
  * @param {String} name 数据表的文件名
  * @returns {Array<Object>} 数据表对象
  */
 module.exports.db_getObj = (name) => {
   if (this.db[name]) return this.db[name];
-  this.db[name] = [];
+  this.db[name] = {};
   return this.db[name];
 }
 
 /**
- * 从数据库中获取面板配置对象
- * @returns {{PanelConfig}} 面板配置对象
+ * 获取数据表已进行操作，数据表类型都是数组
+ * @param {String} name 数据表的名字
+ * @returns {Array<Object>} 数据表对象
  */
-module.exports.db_getObj_panelConfig = () => {
-  const panelConfigList = this.db_getObj("panelConfig");
-  if (panelConfigList.length == 0) panelConfigList.push(new PanelConfig());
-  return panelConfigList[0];
+module.exports.db_getList = (name) => {
+  if (this.db[name]) return this.db[name];
+  this.db[name] = [];
+  return this.db[name];
 }

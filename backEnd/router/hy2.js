@@ -3,9 +3,9 @@ const router = express.Router();
 const tools = require("../tools.js");
 
 // 初始化
-const db_server = tools.db_getObj("servers");
-const db_account = tools.db_getObj("accounts");
-const db_pannelConfig = tools.db_getObj_panelConfig();
+const db_server = tools.db_getList("servers");
+const db_account = tools.db_getList("accounts");
+const db_panelConfig = tools.db_getObj("panelConf");
 if (db_server.length == 0) db_server.push({}, {});
 
 // 认证服务器类
@@ -56,7 +56,7 @@ router.post("/auth", (req, res, next) => {
   // 检查服务器是否在允许范围内
   const serverAccess = targetAccount.userInfo.accessServer.some(alias => db_server[0][req.ip].alias == alias);
   // 检查面板默认配置是否允许链接
-  const defaultPermission = db_pannelConfig.defaultServerPermission;
+  const defaultPermission = db_panelConfig.defaultServerPermission;
   // 检查服务器加上当前在线是否依然不超限制
   const serverOnlineCount = (db_server[0][req.ip].nowOnline + 1) <= db_server[0][req.ip].maxOnline;
   // 检测用户加上当前在线是否依然不超限制

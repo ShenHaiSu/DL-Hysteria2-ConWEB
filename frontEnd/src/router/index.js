@@ -43,6 +43,13 @@ const router = createRouter({
       meta: {
         describe: "增添、修改、删除面板的账户相关信息"
       }
+    }, {
+      path: "/panelConf",
+      name: "面板控制面",
+      component: () => import("@/views/PanelConf.vue"),
+      meta: {
+        describe: "面板配置相关信息"
+      }
     }
   ]
 })
