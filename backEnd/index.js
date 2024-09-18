@@ -29,11 +29,11 @@ app.use((req, res, next) => {
 const folderList = ["logs", "cert", "db", "node_modules"];
 tools.checkFolderList(folderList);
 
-// 检查是否已经存在adminKey
-let adminKey = tools.getAdminKey();
-
 // 挂载本地db文件
 tools.db_init();
+
+// 检查是否已经存在adminKey
+tools.getAdminKey();
 
 // 挂载分支路由
 const { router: apiMain } = require("./router/main.js");
@@ -46,7 +46,6 @@ app.use(express.static(path.join(__dirname, 'static')));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'static', 'index.html'));
 });
-
 
 const httpsOptions = {
   key: fs.readFileSync('./cert/server.key'),

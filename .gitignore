@@ -3,7 +3,7 @@ backEnd/node_modules
 backEnd/cert
 backEnd/logs
 backEnd/db
-backEnd/adminKey.json
+backEnd/build
 
 # 前端屏蔽
 frontEnd/node_modules

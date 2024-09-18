@@ -7,10 +7,19 @@ const db_panelConf = tools.db_getObj("panelConf");
 const db_account = tools.db_getList("accounts");
 
 const allowKeyList = [
-  "allowNonManagerRegister",
-  "allowNonManagerLogin",
-  "hy2ServerDefaultPermission"
+  "allowNonManagerRegister", // 是否允许非管理员注册
+  "allowNonManagerLogin", // 是否允许非管理员登录
+  "hy2ServerDefaultPermission" // 代理服务器默认权限
 ]
+
+// 启动初始化检查
+{
+  // 检查数据对象是否完整
+  for (let i = 0; i < allowKeyList.length; i++) {
+    if (db_panelConf[allowKeyList[i]] != undefined) continue;
+    db_panelConf[allowKeyList[i]] = false; // 若数据对象不完整，则初始化为false
+  }
+}
 
 // 本路径API全部都需要管理员权限才能访问
 router.use((req, res, next) => {
@@ -26,11 +35,6 @@ router.use((req, res, next) => {
 
 // 获取面板设置
 router.get("/getAll", (req, res, next) => {
-  // 检查数据对象是否完整
-  for (let i = 0; i < allowKeyList.length; i++) {
-    if (db_panelConf[allowKeyList[i]] != undefined) continue;
-    db_panelConf[allowKeyList[i]] = false; // 若数据对象不完整，则初始化为false
-  }
   // 返回数据
   res.status(200).send(db_panelConf);
 });

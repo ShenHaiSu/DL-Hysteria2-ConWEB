@@ -148,18 +148,17 @@ const registClick = () => {
     }
   }).then(axiosRes => {
     // 返回的数据
-    /**
-     * {
-     *  userName String,
-     *  userPermission String,
-     *  userInfo: {},
-     * }
-     */
     const data = axiosRes.data;
-    authStore.setUserName(data.userName);
-    authStore.setUserPermission(data.userPermission);
-    authStore.coverUserInfo(data.userInfo);
-    authStore.setIsLogin(true);
+    try {
+      authStore.setUserName(data.userName);
+      authStore.setUserPermission(data.userPermission);
+      authStore.coverUserInfo(data.userInfo);
+      authStore.setIsLogin(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      toast.add({ severity: "success", summary: "成功", detail: data.msg, life: 3000 });
+    }
     // 完成登录
   }).catch(axiosErr => {
     toast.add({ severity: "error", summary: "错误", detail: axiosErr.response.data.msg, life: 3000 });

@@ -72,23 +72,10 @@ module.exports.num2Length = (input, length = 2) => {
  */
 module.exports.getAdminKey = () => {
   if (this.runtimeDate.adminKey.length != 0) return this.runtimeDate.adminKey;
-
-  let adminKey = "";
-  let keyIsExist = false;
-  try {
-    adminKey = require("./adminKey.json")['adminKey'];
-    keyIsExist = true;
-  } catch {
-    adminKey = this.genAdminKey(30);
-    fs.writeFileSync("./adminKey.json", JSON.stringify({ adminKey }))
-  }
-  this.log(`adminKey: ` + adminKey);
-  if (!keyIsExist) {
-    keyIsExist = true;
-    this.log(`No adminKey.json file was detected, and a 30-bit random string was randomly generated as the administrator key.`);
-  }
-  this.runtimeDate.adminKey = adminKey;
-  return adminKey;
+  const db_adminKey = this.db_getObj("adminKey");
+  if (db_adminKey['content'] == undefined) db_adminKey['content'] = this.genAdminKey(30);
+  this.log(`管理员秘钥：${db_adminKey['content']}`);
+  return db_adminKey['content'];
 }
 
 /**

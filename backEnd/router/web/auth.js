@@ -4,6 +4,7 @@ const tools = require("../../tools.js");
 
 // 获取accounts数据对象
 const db_account = tools.db_getList("accounts");
+const db_panelConf = tools.db_getObj("panelConf");
 const adminKey = tools.runtimeDate.adminKey;
 
 // 定义 account 类
@@ -17,30 +18,26 @@ const rejectResponse = (req, res, next) => {
 
 // 注册接口
 router.post("/register", (req, res, next) => {
+  // 是否传入adminKey
   const isAdmin = req.body.adminKey == adminKey;
+  if (!isAdmin && !db_panelConf.allowNonManagerRegister) return next(new Error("非管理员禁止注册"));
+  if (db_account.some(account => account['userName'] == req.body['userName'])) return next(new Error("已存在"));
 
-  if (db_account.some(account => account['userName'] == req.body['userName'])) {
-    res.status(500);
-    res.send({
-      error: true,
-      msg: "该账号已被注册。"
-    });
-    return;
-  } else {
-    const newData = new Account(req.body['userName'], req.body['userPassword'], isAdmin);
-    newData.session = tools.genRandomString(30);
-    db_account.push(newData);
+  const newData = new Account(req.body['userName'], req.body['userPassword'], isAdmin);
+  newData.session = tools.genRandomString(30);
+  db_account.push(newData);
 
-    res.status(200);
-    if (!req.body['manual']) res.cookie("session", newData.session, { httpOnly: true });
-    res.send({
-      error: false,
-      msg: "欢迎你，" + newData.userName,
-      userInfo: {},
-      userName: newData.userName,
-      userPermission: newData.userPermission
-    });
-  }
+  res.status(200);
+  if (!isAdmin && !db_panelConf.allowNonManagerLogin) return res.send({ error: false, msg: "注册成功，请联系管理员开通登录权限" });
+  if (!req.body['manual']) res.cookie("session", newData.session, { httpOnly: true });
+  res.send({
+    error: false,
+    msg: "欢迎你，" + newData.userName,
+    userInfo: {},
+    userName: newData.userName,
+    userPermission: newData.userPermission
+  });
+
 })
 
 // 登出接口
@@ -69,30 +66,25 @@ router.post("/logout", (req, res, next) => {
 
 // 登录接口
 router.post("/login", (req, res, next) => {
-  const targetIndex = db_account.findIndex(account => account.userName == req.body['userName'] && account.userPassword == req.body['userPassword']);
+  // const targetIndex = db_account.findIndex(account => account.userName == req.body['userName'] && account.userPassword == req.body['userPassword']);
+  const account = db_account.find(account => account.userName == req.body['userName'] && account.userPassword == req.body['userPassword']);
+  res.cookie("session", "", { httpOnly: true });
 
-  if (targetIndex == -1) {
-    res.status(500);
-    res.cookie("session", "", { httpOnly: true });
-    res.send({
-      error: true,
-      msg: "账号或密码错误，请重试"
-    });
-    return;
-  } else {
-    let account = db_account[targetIndex];
-    account.session = tools.genRandomString(30);
-    res.status(200);
-    res.cookie("session", account.session, { httpOnly: true });
-    res.send({
-      error: false,
-      msg: `欢迎回来，${account.userName}`,
-      userName: account.userName,
-      userPermission: account.userPermission,
-      userInfo: account.userInfo
-    });
-    return;
-  }
+  if (account == undefined) return next(new Error("用户名或密码错误"));
+  if (account.userPermission != "admin" && !db_panelConf.allowNonManagerLogin) return next(new Error("非管理员禁止登录"));
+
+  account.session = tools.genRandomString(30);
+  res.status(200);
+  res.cookie("session", account.session, { httpOnly: true });
+  res.send({
+    error: false,
+    msg: `欢迎回来，${account.userName}`,
+    userName: account.userName,
+    userPermission: account.userPermission,
+    userInfo: account.userInfo
+  });
+  return;
+
 })
 
 // 查询登录状态接口
@@ -209,6 +201,12 @@ router.post("/edit", (req, res, next) => {
   // 返回成功
   res.status(200);
   res.send({ error: false, msg: "完成修改", targetAccount });
+})
+
+// 错误承接
+router.use((err, req, res, next) => {
+  res.status(500);
+  res.send({ error: true, msg: err.message || "服务器内部错误" });
 })
 
 
